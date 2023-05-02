@@ -1,10 +1,10 @@
 <script lang="ts">
-  import type { Auth, User } from 'firebase/auth'
-  import { serviceStore, userStore } from '$lib/stores'
+  import type { Auth, User } from 'firebase/auth';
+  import { serviceStore, userStore } from '$lib/stores';
 
   interface $$Slots {
-    default: { user: User }
-    signedOut: {}
+    default: { user: User };
+    signedOut: {};
   }
 
   export let auth: Auth = $serviceStore.auth;

@@ -9,15 +9,15 @@ type ServiceStore = { auth: Auth; firestore: Firestore };
 export const serviceStore = writable<ServiceStore>();
 
 export function userStore(auth: Auth) {
-	let unsubscribe: () => void;
+  let unsubscribe: () => void;
 
-	const { subscribe } = writable(auth.currentUser ?? null, (set) => {
-		unsubscribe = onAuthStateChanged(auth, (user) => {
-			set(user);
-		});
+  const { subscribe } = writable(auth.currentUser ?? null, (set) => {
+    unsubscribe = onAuthStateChanged(auth, (user) => {
+      set(user);
+    });
 
-		return () => unsubscribe();
-	});
+    return () => unsubscribe();
+  });
 
-	return { subscribe };
+  return { subscribe };
 }
