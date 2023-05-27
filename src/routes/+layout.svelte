@@ -4,6 +4,6 @@
 </script>
 
 <Navbar />
-<div class="px-2 mx-auto container">
+<div class="mt-20 px-4 mx-auto container">
   <slot />
 </div>
