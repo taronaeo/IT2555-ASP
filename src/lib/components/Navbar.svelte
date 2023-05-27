@@ -6,7 +6,7 @@
   let isDropdownActive = false;
 </script>
 
-<nav class="border-b-4 border-emerald-300 bg-emerald-600">
+<nav class="fixed top-0 w-full border-b-4 border-emerald-700 bg-gradient-to-r from-emerald-600 to-[#008080]">
   <div class="h-16 mx-auto container
               flex flex-wrap items-center justify-between md:justify-start">
     <!-- Dr. Receipt Logo -->
@@ -14,13 +14,12 @@
       <img src={Logo} alt="Dr. Receipts Logo" class="mr-4 h-full">
     </a>
 
-    <div class="h-full ml-auto flex align-middle justify-center md:order-2">
+    <div class="h-full ml-auto flex flex-row md:order-2">
       <!-- Navbar CTA Button -->
-      <a href="/register" class="px-4
-                              inline-flex justify-center items-center
-                              text-sm text-white text-center font-medium
-                              hover:bg-emerald-700 focus:outline-none">
-                              Register
+      <a href="/register" class="p-6 inline-flex items-center
+                                  text-lg text-white text-center font-medium duration-100 transition-colors
+                                  hover:text-emerald-200 focus:outline-none">
+        Register
       </a>
 
       <!-- Navbar Mobile Menu Button -->
@@ -32,23 +31,19 @@
     </div>
 
     <!-- Middle Menu Links -->
-    <div class="py-4 z-20 w-full min-h-full md:p-0
-                {isDropdownActive ? 'block' : 'hidden md:flex'} bg-emerald-300 md:bg-inherit
+    <div class="{isDropdownActive ? 'block' : 'hidden md:flex'}
+                py-4 z-20 w-full min-h-full md:p-0
                 flex flex-col md:flex-row md:items-center
+                bg-gradient-to-r from-emerald-600 to-[#008080] md:bg-inherit md:from-transparent md:to-transparent
                 md:w-auto md:order-1">
-      <a href="/who" class="px-6 py-2 text-emerald-900 hover:bg-emerald-200
+      <a href="/who" class="px-6 py-2 text-lg text-white font-medium
                             md:py-5 md:text-white md:hover:bg-emerald-700">
-        Who are we
+        We are who
       </a>
 
-      <a href="/who" class="px-6 py-2 text-emerald-900 hover:bg-emerald-200
+      <a href="/who" class="px-6 py-2 text-lg text-white font-medium
                             md:py-5 md:text-white md:hover:bg-emerald-700">
         Tools and services
-      </a>
-
-      <a href="/who" class="px-6 py-2 text-emerald-900 hover:bg-emerald-200
-                            md:py-5 md:text-white md:hover:bg-emerald-700">
-        Login
       </a>
     </div>
   </div>
