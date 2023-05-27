@@ -16,7 +16,7 @@
 
     <div class="h-full ml-auto flex flex-row md:order-2">
       <!-- Navbar CTA Button -->
-      <a href="/register" class="p-6 inline-flex items-center
+      <a href="/register" class="p-4 inline-flex items-center
                                   text-lg text-white text-center font-medium duration-100 transition-colors
                                   hover:text-emerald-200 focus:outline-none">
         Register
