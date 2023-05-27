@@ -1,5 +1,9 @@
 <script>
   import '../app.css';
+  import { Navbar } from '$lib'
 </script>
 
-<slot />
+<Navbar />
+<div class="px-2 mx-auto container">
+  <slot />
+</div>
