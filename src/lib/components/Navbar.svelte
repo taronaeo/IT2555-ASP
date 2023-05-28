@@ -16,10 +16,11 @@
 
     <div class="h-full ml-auto flex flex-row md:order-2">
       <!-- Navbar CTA Button -->
-      <a href="/register" class="p-4 inline-flex items-center
-                                  text-lg text-white text-center font-medium duration-100 transition-colors
-                                  hover:text-emerald-200 focus:outline-none">
-        Register
+      <a href="/account/login"
+          class="p-4 inline-flex items-center
+                  text-lg text-white text-center font-medium duration-100 transition-colors
+                  hover:text-emerald-200 focus:outline-none">
+        Login
       </a>
 
       <!-- Navbar Mobile Menu Button -->
@@ -38,7 +39,7 @@
                 md:w-auto md:order-1">
       <a href="/who" class="px-6 py-2 text-lg text-white font-medium
                             md:py-5 md:text-white md:hover:bg-emerald-700">
-        We are who
+        Who we are
       </a>
 
       <a href="/who" class="px-6 py-2 text-lg text-white font-medium
