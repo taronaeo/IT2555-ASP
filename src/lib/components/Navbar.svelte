@@ -37,12 +37,12 @@
                 flex flex-col md:flex-row md:items-center
                 bg-gradient-to-r from-emerald-600 to-[#008080] md:bg-inherit md:from-transparent md:to-transparent
                 md:w-auto md:order-1">
-      <a href="/who" class="px-6 py-2 text-lg text-white font-medium
+      <a href="/" class="px-6 py-2 text-lg text-white font-medium
                             md:py-5 md:text-white md:hover:bg-emerald-700">
         Who we are
       </a>
 
-      <a href="/who" class="px-6 py-2 text-lg text-white font-medium
+      <a href="/" class="px-6 py-2 text-lg text-white font-medium
                             md:py-5 md:text-white md:hover:bg-emerald-700">
         Tools and services
       </a>
