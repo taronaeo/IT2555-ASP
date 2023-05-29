@@ -6,7 +6,7 @@
   let isDropdownActive = false;
 </script>
 
-<nav class="fixed top-0 w-full border-b-4 border-emerald-700 bg-gradient-to-r from-emerald-600 to-[#008080]">
+<nav class="z-50 fixed top-0 w-full border-b-4 border-emerald-700 bg-gradient-to-r from-emerald-600 to-[#008080]">
   <div class="h-16 mx-auto container
               flex flex-wrap items-center justify-between md:justify-start">
     <!-- Dr. Receipt Logo -->
