@@ -16,7 +16,8 @@
 </svelte:head>
 
 <section class="w-full grid grid-cols-12 gap-8">
-  <div class="col-span-6 hidden rounded-lg text-gray-300 md:block">
+  <div class="hidden md:block rounded-lg text-gray-300
+              col-span-6 md:col-span-6 xl:col-span-7">
     <ul class="mt-16 space-y-10">
       {#each benefits as { title, description }}
         <li class="flex space-x-4">
@@ -30,7 +31,7 @@
     </ul>
   </div>
 
-  <div class="col-span-12 md:col-span-6">
+  <div class="col-span-12 md:col-span-6 xl:col-span-5">
     <div class="bg-white rounded-lg md:shadow md:border">
       <div class="p-4 space-y-6 md:p-6">
         <h1 class="text-xl text-center text-gray-900
