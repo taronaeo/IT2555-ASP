@@ -114,7 +114,6 @@
 
           <div class="text-center">
             <a
-              target="_self"
               href="/account/login"
               class="font-medium text-sm text-emerald-600 hover:text-emerald-900">
               Have an account already? Login instead
