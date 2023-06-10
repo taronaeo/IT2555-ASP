@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Logo } from '$lib/images'
   import { IconGoogle, IconMicrosoft, AniIconLoading } from '$lib/icons'
 
   import { auth } from '$lib/firebase'
@@ -74,7 +75,13 @@
 
 <!-- If statement to prevent content from rendering whilst redirecting -->
 {#if !$authStore}
-<section class="flex flex-col items-center">
+<section class="py-10 flex flex-col items-center">
+  <div class="max-w-lg w-full">
+    <a href="/">
+      <img src={Logo} alt="Dr. Receipts Logo" class="h-20 mx-auto">
+    </a>
+  </div>
+
   <div class="max-w-lg w-full bg-white rounded-lg md:shadow md:border">
     <div class="p-4 space-y-6 md:p-6">
       <h1 class="text-xl text-center text-gray-900

@@ -1,7 +1,6 @@
 <script>
-  import IconCheckmark from '$lib/icons/checkmark.svg';
-  import IconGoogle from '$lib/icons/google.svelte';
-  import IconMicrosoft from '$lib/icons/microsoft.svelte';
+  import { IconCheckmark, IconGoogle, IconMicrosoft } from '$lib/icons';
+  import { Logo } from '$lib/images';
 
   const benefits = [
     { title: 'Environmentally friendly', description: 'Our digital receipts reduces waste and helps the environment.' },
@@ -15,10 +14,16 @@
   <title>Create your account | Dr. Receipt</title>
 </svelte:head>
 
-<section class="w-full grid grid-cols-12 gap-8">
+<section class="p-10 w-full grid grid-cols-12 gap-8">
   <div class="hidden md:block rounded-lg text-gray-300
               col-span-6 md:col-span-6 xl:col-span-7">
-    <ul class="mt-16 space-y-10">
+    <div class="mb-4">
+      <a href="/">
+        <img src={Logo} alt="Dr. Receipts Logo" class="h-20">
+      </a>
+    </div>
+
+    <ul class="space-y-10">
       {#each benefits as { title, description }}
         <li class="flex space-x-4">
           <img src={IconCheckmark} alt="Checkmark Icon" class="w-6 h-6">
@@ -32,6 +37,8 @@
   </div>
 
   <div class="col-span-12 md:col-span-6 xl:col-span-5">
+    <img src={Logo} alt="Dr. Receipts Logo" class="h-20 mx-auto md:hidden">
+
     <div class="bg-white rounded-lg md:shadow md:border">
       <div class="p-4 space-y-6 md:p-6">
         <h1 class="text-xl text-center text-gray-900
