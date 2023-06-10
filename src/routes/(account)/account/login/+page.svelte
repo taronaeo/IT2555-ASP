@@ -78,7 +78,7 @@
 <section class="py-10 flex flex-col items-center">
   <div class="max-w-lg w-full">
     <a href="/">
-      <img src={Logo} alt="Dr. Receipts Logo" class="h-20 mx-auto">
+      <Logo class='py-4 h-20 mx-auto' />
     </a>
   </div>
 

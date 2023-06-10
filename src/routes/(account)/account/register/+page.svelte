@@ -1,6 +1,9 @@
 <script>
-  import { IconCheckmark, IconGoogle, IconMicrosoft } from '$lib/icons';
   import { Logo } from '$lib/images';
+  import { IconCheckmark, IconGoogle, IconMicrosoft } from '$lib/icons';
+
+  import { goto } from '$app/navigation';
+  import { authStore } from '$lib/stores';
 
   const benefits = [
     { title: 'Environmentally friendly', description: 'Our digital receipts reduces waste and helps the environment.' },
@@ -8,18 +11,21 @@
     { title: 'Always-there™ receipts', description: 'View and download your digital receipts conveniently in PDF.' },
     { title: 'Easy-disputes', description: 'Notice something not right in your receipt? File a dispute easily with an account.' }
   ]
+
+  $: if ($authStore) goto('/');
 </script>
 
 <svelte:head>
   <title>Create your account | Dr. Receipt</title>
 </svelte:head>
 
+{#if !$authStore}
 <section class="p-10 w-full grid grid-cols-12 gap-8">
   <div class="hidden md:block rounded-lg text-gray-300
               col-span-6 md:col-span-6 xl:col-span-7">
     <div class="mb-4">
       <a href="/">
-        <img src={Logo} alt="Dr. Receipts Logo" class="h-20">
+        <Logo class='py-4 h-20' />
       </a>
     </div>
 
@@ -37,7 +43,9 @@
   </div>
 
   <div class="col-span-12 md:col-span-6 xl:col-span-5">
-    <img src={Logo} alt="Dr. Receipts Logo" class="h-20 mx-auto md:hidden">
+    <a href="/">
+      <Logo class='py-4 h-20 mx-auto md:hidden' />
+    </a>
 
     <div class="bg-white rounded-lg md:shadow md:border">
       <div class="p-4 space-y-6 md:p-6">
@@ -131,3 +139,4 @@
     </div>
   </div>
 </section>
+{/if}
