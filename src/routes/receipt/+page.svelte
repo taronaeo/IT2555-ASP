@@ -19,7 +19,7 @@
         </div> 
         <div class=" leading-7 grid grid-cols-6 mx-6 font-light">
             <div class="col-span-5">Push Up Bar 500 Blue</div>
-            <div class="col-span-1 text-right">$99.00</div>
+            <div class="col-span-1 text-right">$23.00</div>
 
             <div class="col-span-5">Push Up Bar 500 Blue</div>
             <div class="col-span-1 text-right">$23.00</div>
@@ -28,32 +28,29 @@
             <div class="col-span-1 text-right">$8.90</div>
 
             <div class="col-span-5">Upsize Rice</div>
-            <div class="col-span-1 text-right">$8.90</div>
+            <div class="col-span-1 text-right">$1.00</div>
 
             <div class="col-span-5">Yuzu Cola</div>
             <div class="col-span-1 text-right">$3.00</div>
 
             <div class="col-span-5">Yuzu Cola</div>
             <div class="col-span-1 text-right">$3.00</div>
-
-            <div class="col-span-5">Mazda Rx7</div>
-            <div class="col-span-1 text-right">$0.00</div>
 
         </div>
         <div class=""><hr class="border-t-2 border-black border-dashed mb-2 mx-6"></div>
         <div class="grid grid-cols-6"> <!--receipt Totals div-->
             
             <div class="col-span-1 mx-6 font-semibold">SUBTOTAL</div>
-            <div class="col-span-5 mx-6 text-right">$99990.99</div>
+            <div class="col-span-5 mx-6 text-right">$63.90</div>
 
             <div class="col-span-1 mx-6 font-semibold">GST<span class="font-thin">(8%)</span></div>
-            <div class="col-span-5 mx-6 text-right">$9.01</div>
+            <div class="col-span-5 mx-6 text-right">$5.10</div>
 
             <div class="col-span-1 mx-6 font-semibold">TOTAL</div>
-            <div class="col-span-5 mx-6 text-right">$100000.00</div>
+            <div class="col-span-5 mx-6 text-right">$69.00</div>
 
             <div class="col-span-2 mx-6 font-semibold">VISA(**2030)</div>
-            <div class="col-span-4 mx-6 text-right">$100000.00</div>
+            <div class="col-span-4 mx-6 text-right">$69.00</div>
 
             <div class="col-span-1 mx-6 font-semibold">CHANGE</div>
             <div class="col-span-5 mx-6 text-right">$0.00</div>

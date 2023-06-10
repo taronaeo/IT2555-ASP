@@ -9,7 +9,7 @@
 
 	<h3>deziduck was here</h3>
 
-	<h3> Trav was here </h3>
+	<h3>Trav was here</h3>
 
 	<h3>Aaron was here</h3>
 
