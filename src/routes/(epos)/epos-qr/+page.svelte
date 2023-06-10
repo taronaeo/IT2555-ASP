@@ -1,10 +1,13 @@
+
+
 <div class="text-xl grid grid-cols-2 border-2 border-slate-300 shadow-xl">
     <div class=" py-6 text-center">
         <span class="text-emerald-600 text-4xl font-bold">Payment Successful</span>
-        <img class = "m-auto" src="example-qr(tok).jpeg" alt="QR Code for Scanning">
+        <img class = "w-[300px] aspect-1 m-auto" src="/api/qr-generation" alt="QR Code for Scanning">
         <span>Thank you for shopping with <span class="font-bold text-emerald-600">NTUC Fairprice</span>!</span><br>
         <span class="font-xs">(Scan QR code for receipt)</span><br>
         <span class="font-bold">Valid for 1 min.</span>
+    
     </div>
     <div class=" border-t-[1px] border-slate-200 bg-slate-400">
 
