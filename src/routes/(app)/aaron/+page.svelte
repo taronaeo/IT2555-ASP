@@ -17,7 +17,7 @@
 
   // Step 1: Import required modules
   import { firestore } from '$lib/firebase'
-  import { addDoc, collection, onSnapshot, serverTimestamp, query, orderBy, FieldValue } from 'firebase/firestore'
+  import { addDoc, collection, onSnapshot, serverTimestamp, query, orderBy, FieldValue, limit } from 'firebase/firestore'
 
   const ref = collection(firestore, 'receipts');
   let receipts: Receipt[] = [];
@@ -42,7 +42,7 @@
   }
 
   // Step 3: Add a real-time collection listener to look for new data
-  const q = query(ref, orderBy('created_at', 'asc'))
+  const q = query(ref, orderBy('created_at', 'asc'), limit(10))
   const unsubscribe = onSnapshot(q, (snap) => {
     receipts = snap.docs.map(d => d.data() as Receipt);
   });
