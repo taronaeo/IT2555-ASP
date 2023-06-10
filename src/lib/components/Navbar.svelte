@@ -1,7 +1,8 @@
 <script>
-  import Menu from '$lib/icons/menu.svg';
-  import Close from '$lib/icons/close.svg';
   import Logo from '$lib/images/logo.png';
+
+  import { authStore } from '$lib/stores'
+  import { IconMenu, IconClose } from '$lib/icons'
 
   let isDropdownActive = false;
 </script>
@@ -16,17 +17,27 @@
 
     <div class="h-full ml-auto flex flex-row md:order-2">
       <!-- Navbar CTA Button -->
-      <a href="/register" class="p-4 inline-flex items-center
-                                  text-lg text-white text-center font-medium duration-100 transition-colors
-                                  hover:text-emerald-200 focus:outline-none">
-        Register
-      </a>
+      {#if !$authStore}
+        <a href="/account/login"
+            class="p-4 inline-flex items-center
+                    text-lg text-white text-center font-medium duration-100 transition-colors
+                    hover:text-emerald-200 focus:outline-none">
+          Login
+        </a>
+      {:else}
+        <a href="/account/profile"
+            class="p-4 inline-flex items-center
+                    text-lg text-white text-center font-medium duration-100 transition-colors
+                    hover:text-emerald-200 focus:outline-none">
+          Profile
+        </a>
+      {/if}
 
       <!-- Navbar Mobile Menu Button -->
       <button on:click={() => isDropdownActive = !isDropdownActive}
               class="p-4 aspect-1 inline-flex items-center justify-center
                       md:hidden focus:outline-none">
-        <img src={!isDropdownActive ? Menu : Close} alt="Open Menu" class="w-6 h-6">
+        <img src={!isDropdownActive ? IconMenu : IconClose} alt="Open Menu" class="w-6 h-6">
       </button>
     </div>
 
@@ -36,12 +47,12 @@
                 flex flex-col md:flex-row md:items-center
                 bg-gradient-to-r from-emerald-600 to-[#008080] md:bg-inherit md:from-transparent md:to-transparent
                 md:w-auto md:order-1">
-      <a href="/who" class="px-6 py-2 text-lg text-white font-medium
+      <a href="/" class="px-6 py-2 text-lg text-white font-medium
                             md:py-5 md:text-white md:hover:bg-emerald-700">
-        We are who
+        Who we are
       </a>
 
-      <a href="/who" class="px-6 py-2 text-lg text-white font-medium
+      <a href="/" class="px-6 py-2 text-lg text-white font-medium
                             md:py-5 md:text-white md:hover:bg-emerald-700">
         Tools and services
       </a>
