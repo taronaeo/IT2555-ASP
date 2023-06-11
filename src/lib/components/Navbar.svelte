@@ -1,5 +1,5 @@
 <script>
-  import Logo from '$lib/images/logo.png';
+  import { Logo } from '$lib/images';
 
   import { authStore } from '$lib/stores'
   import { IconMenu, IconClose } from '$lib/icons'
@@ -12,7 +12,7 @@
               flex flex-wrap items-center justify-between md:justify-start">
     <!-- Dr. Receipt Logo -->
     <a href="/" class="pl-2 h-full">
-      <img src={Logo} alt="Dr. Receipts Logo" class="mr-4 h-full">
+      <Logo class='py-2 mr-4 h-full' gradient_start='#fff' gradient_stop='#fff' />
     </a>
 
     <div class="h-full ml-auto flex flex-row md:order-2">

@@ -2,14 +2,14 @@
     let isHovered=false;
 </script>
 
-<div class="md:grid md:gap-x-3 md:grid-cols-2 md:grid-rows-3">
+<div class="md:grid md:gap-8 md:grid-cols-2 md:grid-rows-3">
 
 
 
-<div class=" border-t-[1px] border-slate-200 bg-slate-400">
+<div class=" border-t-4 border-emerald-600 bg-slate-400">
 
 
-    <div class=" whitespace-normal m-auto col-span-2 md:col-span-1  bg-white py-6 drop-shadow-xl">
+    <div class=" whitespace-normal m-auto col-span-2 md:col-span-1  bg-white py-6 shadow-lg">
         <div class="text-center"> <!--Div for header-->
             <div class='text-2xl font-bold my-2'><img class="h-20 inline text-center" src="fairprice.svg" alt='logo'></div>
             <div class='text-md font-light'>33A Orchard Road, #03-13, Mandarin Gallery</div>
@@ -19,7 +19,7 @@
         </div> 
         <div class=" leading-7 grid grid-cols-6 mx-6 font-light">
             <div class="col-span-5">Push Up Bar 500 Blue</div>
-            <div class="col-span-1 text-right">$99.00</div>
+            <div class="col-span-1 text-right">$23.00</div>
 
             <div class="col-span-5">Push Up Bar 500 Blue</div>
             <div class="col-span-1 text-right">$23.00</div>
@@ -28,32 +28,29 @@
             <div class="col-span-1 text-right">$8.90</div>
 
             <div class="col-span-5">Upsize Rice</div>
-            <div class="col-span-1 text-right">$8.90</div>
+            <div class="col-span-1 text-right">$1.00</div>
 
             <div class="col-span-5">Yuzu Cola</div>
             <div class="col-span-1 text-right">$3.00</div>
 
             <div class="col-span-5">Yuzu Cola</div>
             <div class="col-span-1 text-right">$3.00</div>
-
-            <div class="col-span-5">Mazda Rx7</div>
-            <div class="col-span-1 text-right">$0.00</div>
 
         </div>
         <div class=""><hr class="border-t-2 border-black border-dashed mb-2 mx-6"></div>
         <div class="grid grid-cols-6"> <!--receipt Totals div-->
             
             <div class="col-span-1 mx-6 font-semibold">SUBTOTAL</div>
-            <div class="col-span-5 mx-6 text-right">$99990.99</div>
+            <div class="col-span-5 mx-6 text-right">$63.90</div>
 
             <div class="col-span-1 mx-6 font-semibold">GST<span class="font-thin">(8%)</span></div>
-            <div class="col-span-5 mx-6 text-right">$9.01</div>
+            <div class="col-span-5 mx-6 text-right">$5.10</div>
 
             <div class="col-span-1 mx-6 font-semibold">TOTAL</div>
-            <div class="col-span-5 mx-6 text-right">$100000.00</div>
+            <div class="col-span-5 mx-6 text-right">$69.00</div>
 
             <div class="col-span-2 mx-6 font-semibold">VISA(**2030)</div>
-            <div class="col-span-4 mx-6 text-right">$100000.00</div>
+            <div class="col-span-4 mx-6 text-right">$69.00</div>
 
             <div class="col-span-1 mx-6 font-semibold">CHANGE</div>
             <div class="col-span-5 mx-6 text-right">$0.00</div>
@@ -107,9 +104,9 @@
         Download as PDF</button>
     </div>
 
-    <div class="md:h-28  md:my-0 my-3 border-2 border-emerald-700  bg-emerald-600 px-3 py-3 shadow-xl rounded-lg">
-        <div class="text-center text-white font-bold">Have troubles with this receipt?</div>
-        <div class="text-center"><button class="md:mt-3 border-2 bg-emerald-300 border-emerald-500  m-2 p-2 rounded-md text-center ">Contact Support</button></div>
+    <div class="md:h-28  md:my-0 my-3 border-2  px-3 py-3 shadow rounded-lg">
+        <div class="text-center ">Have troubles with this receipt?</div>
+        <div class="text-center"><button class="md:mt-3 border-2 bg-emerald-600 px-5 py-2.5  m-2 text-white rounded-lg text-center ">Contact Support</button></div>
     </div>
     </div>
 </div>

@@ -1,4 +1,5 @@
 {
+	"type": "module",
 	"name": "it2555-asp",
 	"version": "0.0.1",
 	"license": "MIT",
@@ -12,14 +13,19 @@
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
 		"format": "prettier --plugin-search-dir . --write ."
 	},
+	"dependencies": {
+		"@fontsource/dm-sans": "^5.0.3",
+		"firebase": "^9.22.1",
+		"qr-image": "^3.2.0"
+	},
 	"devDependencies": {
-		"@fontsource/dm-sans": "^5.0.1",
 		"@neoconfetti/svelte": "^1.0.0",
 		"@sveltejs/adapter-auto": "^2.0.0",
 		"@sveltejs/kit": "^1.5.0",
 		"@tailwindcss/aspect-ratio": "^0.4.2",
 		"@tailwindcss/forms": "^0.5.3",
 		"@types/cookie": "^0.5.1",
+		"@types/qr-image": "^3.2.5",
 		"@typescript-eslint/eslint-plugin": "^5.45.0",
 		"@typescript-eslint/parser": "^5.45.0",
 		"autoprefixer": "^10.4.14",
@@ -36,9 +42,5 @@
 		"tslib": "^2.4.1",
 		"typescript": "^5.0.0",
 		"vite": "^4.3.0"
-	},
-	"type": "module",
-	"dependencies": {
-		"firebase": "^9.22.1"
 	}
 }
