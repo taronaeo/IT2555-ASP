@@ -4,7 +4,7 @@
 
 <Navbar />
 
-<div class="mt-20 px-4 mx-auto container">
+<div class="mt-20 mx-auto container">
   <slot />
 </div>
 
