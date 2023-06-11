@@ -1,9 +1,26 @@
-<script>
+<script lang="ts">
   import { Logo } from '$lib/images';
-  import { IconCheckmark, IconGoogle, IconMicrosoft } from '$lib/icons';
+  import {
+    IconGoogle,
+    IconMicrosoft,
+    IconCheckmark,
+    AniIconLoading
+  } from '$lib/icons';
 
   import { goto } from '$app/navigation';
   import { authStore } from '$lib/stores';
+
+  import { auth } from '$lib/firebase'
+  import {
+    setPersistence,
+    indexedDBLocalPersistence,
+    createUserWithEmailAndPassword
+  } from 'firebase/auth'
+
+  let full_name: string = '';
+  let email: string = '';
+  let password: string = '';
+  let isLoading: boolean = false;
 
   const benefits = [
     { title: 'Environmentally friendly', description: 'Our digital receipts reduces waste and helps the environment.' },
@@ -12,6 +29,19 @@
     { title: 'Easy-disputes', description: 'Notice something not right in your receipt? File a dispute easily with an account.' }
   ]
 
+  async function signUpEmailPassword() {
+    isLoading = true;
+
+    try {
+      await setPersistence(auth, indexedDBLocalPersistence);
+      await createUserWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+      console.error(error);
+    }
+
+    isLoading = false;
+  }
+
   $: if ($authStore) goto('/');
 </script>
 
@@ -19,6 +49,7 @@
   <title>Create your account | Dr. Receipt</title>
 </svelte:head>
 
+<!-- If statement to prevent content from rendering whilst redirecting -->
 {#if !$authStore}
 <section class="p-10 w-full grid grid-cols-12 gap-8">
   <div class="hidden md:block rounded-lg text-gray-300
@@ -55,18 +86,22 @@
         </h1>
 
         <div class="flex flex-col gap-2 md:flex-row">
-          <button class="px-4 py-2.5 w-full
-                          text-sm font-medium border rounded-lg
-                          inline-flex items-center justify-center gap-2
-                          hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-emerald-300">
+          <button
+            disabled={isLoading}
+            class="px-4 py-2.5 w-full
+                    text-sm font-medium border rounded-lg
+                    inline-flex items-center justify-center gap-2
+                    hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-emerald-300">
             <IconGoogle class='w-5 h-5 aspect-1' />
             Sign up with Google
           </button>
 
-          <button class="px-4 py-2.5 w-full
-                          text-sm font-medium border rounded-lg
-                          inline-flex items-center justify-center gap-2
-                          hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-emerald-300">
+          <button
+            disabled={isLoading}
+            class="px-4 py-2.5 w-full
+                    text-sm font-medium border rounded-lg
+                    inline-flex items-center justify-center gap-2
+                    hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-emerald-300">
             <IconMicrosoft class='w-5 h-5 aspect-1' />
             Sign up with Microsoft
           </button>
@@ -78,17 +113,20 @@
           or
         </p>
 
-        <form action="/" class="space-y-6">
+        <form action="/" class="space-y-6" on:submit|preventDefault={signUpEmailPassword}>
           <div>
             <label for="email" class="block mb-2 font-medium text-sm text-gray-900">Email address</label>
             <input
               id="email"
               type="email"
               name="email"
+              disabled={isLoading}
+              bind:value={email}
               placeholder="name@example.com"
               class="p-2.5 w-full block
                       border border-gray-300 rounded-lg
-                      bg-white text-gray-900 placeholder:text-gray-400"
+                      bg-white text-gray-900 placeholder:text-gray-400
+                      disabled:cursor-not-allowed disabled:opacity-75"
               required />
           </div>
 
@@ -98,10 +136,13 @@
               id="full_name"
               type="text"
               name="full_name"
+              disabled={isLoading}
+              bind:value={full_name}
               placeholder="John Doe"
               class="p-2.5 w-full block
                       border border-gray-300 rounded-lg
-                      bg-white text-gray-900 placeholder:text-gray-400"
+                      bg-white text-gray-900 placeholder:text-gray-400
+                      disabled:cursor-not-allowed disabled:opacity-75"
               required />
           </div>
 
@@ -111,20 +152,29 @@
               id="password"
               type="password"
               name="password"
+              disabled={isLoading}
+              bind:value={password}
               placeholder="••••••••"
-              class="p-2.5 w-full block
+              class="p-2.5 w-full block tracking-widest
                       border border-gray-300 rounded-lg
                       bg-white text-gray-900 placeholder:text-gray-400
-                      tracking-widest" />
+                      disabled:cursor-not-allowed disabled:opacity-75"
+              required />
           </div>
 
           <button
             type="submit"
+            disabled={isLoading}
             class="px-5 py-2.5 w-full rounded-lg
                     text-white text-center font-medium
                     bg-emerald-600 hover:bg-emerald-700
-                    focus:outline-none focus:ring-4 focus:ring-green-300">
-            Create account
+                    focus:outline-none focus:ring-4 focus:ring-green-300
+                    disabled:cursor-not-allowed disabled:opacity-75">
+            {#if !isLoading}
+              Create account
+            {:else}
+              <AniIconLoading class='mx-auto w-6 h-6' fill='#fff' />
+            {/if}
           </button>
 
           <div class="text-center">
