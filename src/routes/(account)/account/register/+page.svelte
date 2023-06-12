@@ -7,9 +7,6 @@
     AniIconLoading
   } from '$lib/icons';
 
-  import { goto } from '$app/navigation';
-  import { authStore } from '$lib/stores';
-
   import { auth } from '$lib/firebase'
   import {
     setPersistence,
@@ -41,16 +38,12 @@
 
     isLoading = false;
   }
-
-  $: if ($authStore) goto('/');
 </script>
 
 <svelte:head>
   <title>Create your account | Dr. Receipt</title>
 </svelte:head>
 
-<!-- If statement to prevent content from rendering whilst redirecting -->
-{#if !$authStore}
 <section class="p-10 w-full grid grid-cols-12 gap-8">
   <div class="hidden md:block rounded-lg text-gray-300
               col-span-6 md:col-span-6 xl:col-span-7">
@@ -189,4 +182,3 @@
     </div>
   </div>
 </section>
-{/if}

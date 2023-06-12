@@ -12,9 +12,6 @@
     GoogleAuthProvider,
   } from 'firebase/auth';
 
-  import { authStore } from '$lib/stores'
-  import { goto } from '$app/navigation'
-
   let email: string = '';
   let password: string = '';
   let isLoading: boolean = false;
@@ -65,16 +62,12 @@
 
     isLoading = false;
   }
-
-  $: if ($authStore) goto('/');
 </script>
 
 <svelte:head>
   <title>Login | Dr. Receipt</title>
 </svelte:head>
 
-<!-- If statement to prevent content from rendering whilst redirecting -->
-{#if !$authStore}
 <section class="py-10 flex flex-col items-center">
   <div class="max-w-lg w-full">
     <a href="/">
@@ -188,4 +181,3 @@
     </div>
   </div>
 </section>
-{/if}
