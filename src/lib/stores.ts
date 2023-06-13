@@ -1,11 +1,21 @@
-import type { User } from 'firebase/auth';
+import type { User } from '$lib/models';
 
-import { writable } from 'svelte/store';
+import { readable } from 'svelte/store';
 import { onAuthStateChanged } from 'firebase/auth';
 
 import { auth } from '$lib/firebase';
+import { usersCol, createStreamDoc } from '$lib/firebase/firestore';
 
-export const authStore = writable<User | null>(undefined, (set) => {
+export const authStore = readable<User | null>(undefined, (set) => {
   if (typeof window === 'undefined') return;
-  onAuthStateChanged(auth, set, console.error);
+  onAuthStateChanged(
+    auth,
+    (user) => {
+      if (!user) return set(null);
+
+      const { stream } = createStreamDoc(usersCol, user.uid);
+      stream(set);
+    },
+    (err) => console.error(err)
+  );
 });
