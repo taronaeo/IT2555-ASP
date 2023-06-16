@@ -3,60 +3,59 @@ import type { ReceiptItem } from "./item";
 import type { Vendor } from "./vendor";
 
 export interface Receipt {
-    readonly 'receiptId': string;
     /**
      * @readonly
      * Unique ID     of Receipt
      */
-    readonly 'vendor': Vendor;
+    readonly 'receiptId': string;
     /**
      * @readonly
-     * Unique ID of vendor
+     * Vendor Details
      */
-    readonly 'userUid': string;
+    readonly 'vendor': Vendor;
     /**
      * @readonly
      * Unique ID of User
      */
-    readonly 'items': ReceiptItem[] ;
+    readonly 'userUid': string;
     /**
      * @readonly
      * Array of Items bought
      */
-    readonly 'subtotal': number;
+    readonly 'items': ReceiptItem[] ;
     /**
      * @readonly
      * Subtotal of Purchase
      */
-    readonly 'gst': number;
+    readonly 'subtotal': number;
     /**
      * @readonly
      * GST
      */
-    readonly 'total': number;
+    readonly 'gst': number;
     /**
      * @readonly
      * Total price of purchase
      */
-    readonly 'date': string;
+    readonly 'total': number;
     /**
      * @readonly
      * Date of purchase
      */
-    readonly 'time': string;
+    readonly 'date': string;
     /**
      * @readonly
      * Time of purchase
      */
-    readonly 'paymentMethod': string;
+    readonly 'time': string;
     /**
      * @readonly
      * Payment Method Used
      */
-    readonly 'change': number,
+    readonly 'paymentMethod': string;
     /**
      * @readonly
      * Change
      */
-
+    readonly 'change': number,
   }
