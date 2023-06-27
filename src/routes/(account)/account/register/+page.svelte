@@ -46,7 +46,7 @@
 
 <section class="p-10 w-full grid grid-cols-12 gap-8">
   <div class="hidden md:block rounded-lg text-gray-300
-              col-span-6 md:col-span-6 xl:col-span-7">
+              col-span-6 md:col-span-6 xl:col-span-6">
     <div class="mb-4">
       <a href="/">
         <Logo class='py-4 h-20' />
@@ -66,7 +66,7 @@
     </ul>
   </div>
 
-  <div class="col-span-12 md:col-span-6 xl:col-span-5">
+  <div class="col-span-12 md:col-span-6 xl:col-span-6">
     <a href="/">
       <Logo class='py-4 h-20 mx-auto md:hidden' />
     </a>
