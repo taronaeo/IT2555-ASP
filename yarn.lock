@@ -2066,6 +2066,11 @@ depd@2.0.0, depd@^2.0.0, depd@~2.0.0:
   resolved "https://registry.yarnpkg.com/depd/-/depd-2.0.0.tgz#b696163cc757560d09cf22cc8fad1571b79e76df"
   integrity sha512-g7nH6P6dyDioJogAAGprGpCtVImJhpPk/roCzdb3fIh61/s/nPsfR6onyMwkCAR/OlC3yBC0lESvUoQEAssIrw==
 
+dequal@^2.0.2:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/dequal/-/dequal-2.0.3.tgz#2644214f1997d39ed0ee0ece72335490a7ac67be"
+  integrity sha512-0je+qPKHEMohvfRTCEo3CrPG6cAzAYgmzKyxRiYSSDkS6eGJdyVJm7WaYA5ECaAD9wLB2T4EEeymA5aFVcYXCA==
+
 destroy@1.2.0, destroy@^1.0.4:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/destroy/-/destroy-1.2.0.tgz#4803735509ad8be552934c67df614f94e66fa015"
@@ -5497,6 +5502,13 @@ svelte-eslint-parser@^0.30.0:
     eslint-visitor-keys "^3.0.0"
     espree "^9.0.0"
 
+svelte-forms-lib@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/svelte-forms-lib/-/svelte-forms-lib-2.0.1.tgz#64895abacda4a98822d2ae52842a6b8f9aeebcb1"
+  integrity sha512-kwbJ3ynsepsrrJyAMrvSc0Lj/myc9vfI2DL8OKxgArZimrNYsRh1gENYhvrcKEI3BiZrv8q3VFfmGo/GMyk7Zg==
+  dependencies:
+    dequal "^2.0.2"
+
 svelte-hmr@^0.15.1:
   version "0.15.2"
   resolved "https://registry.yarnpkg.com/svelte-hmr/-/svelte-hmr-0.15.2.tgz#d2f6fc82e040f2734abd54cea5cbef46828f2538"
@@ -6141,3 +6153,8 @@ zip-stream@^4.1.0:
     archiver-utils "^2.1.0"
     compress-commons "^4.1.0"
     readable-stream "^3.6.0"
+
+zod@^3.21.4:
+  version "3.21.4"
+  resolved "https://registry.yarnpkg.com/zod/-/zod-3.21.4.tgz#10882231d992519f0a10b5dd58a38c9dabbb64db"
+  integrity sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==

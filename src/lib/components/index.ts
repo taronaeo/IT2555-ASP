@@ -1,3 +1,2 @@
-import Navbar from './Navbar.svelte';
-
-export { Navbar };
+export { default as Alert } from './Alert.svelte';
+export { default as Navbar } from './Navbar.svelte';
