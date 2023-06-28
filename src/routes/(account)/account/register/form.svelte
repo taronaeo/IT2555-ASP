@@ -52,9 +52,14 @@
   });
 </script>
 
-<a href="/">
-  <Logo class="py-4 h-20 mx-auto md:hidden" />
-</a>
+<!-- TODO: Why is this not showing on mobile? -->
+<!--        Chrome and Firefox are not displaying it -->
+<!--        Safari is displaying it for some reason -->
+<div class="max-w-lg w-full block md:hidden">
+  <a href="/">
+    <Logo class='py-4 h-20 mx-auto' />
+  </a>
+</div>
 
 <div class="bg-white rounded-lg md:shadow md:border">
   <div class="p-4 space-y-6 md:p-6">

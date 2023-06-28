@@ -1,12 +1,9 @@
 <script lang="ts">
-  let clazz: string = '';
-
-  export { clazz as class };
   export let gradient_start: string = '#059669';
   export let gradient_stop: string = '#0080ac';
 </script>
 
-<svg class={clazz} xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 585.13 131.95">
+<svg class={$$props.class} xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 585.13 131.95">
   <defs>
     <linearGradient id="linear-gradient" x1="0" y1="65.98" x2="585.13" y2="65.98" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color={gradient_start} />

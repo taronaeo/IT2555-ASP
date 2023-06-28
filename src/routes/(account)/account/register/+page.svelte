@@ -7,7 +7,7 @@
   <title>Create your account | Dr. Receipt</title>
 </svelte:head>
 
-<section class="p-10 w-full grid grid-cols-12 gap-8">
+<section class="py-10 md:p-10 w-full grid grid-cols-12 gap-8">
   <div
     class="hidden md:block rounded-lg text-gray-300
               col-span-6 md:col-span-6 xl:col-span-6">
