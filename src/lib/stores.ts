@@ -8,7 +8,7 @@ import { usersCol, createStreamDoc } from '$lib/firebase/firestore';
 
 export const authStore = readable<User | null>(undefined, (set) => {
   if (typeof window === 'undefined') return;
-  onAuthStateChanged(
+  const unsubscribe = onAuthStateChanged(
     auth,
     (user) => {
       if (!user) return set(null);
@@ -18,4 +18,6 @@ export const authStore = readable<User | null>(undefined, (set) => {
     },
     (err) => console.error(err)
   );
+
+  return unsubscribe;
 });
