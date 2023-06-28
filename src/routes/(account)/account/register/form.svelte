@@ -66,21 +66,15 @@
 
     <div class="flex flex-col gap-2 md:flex-row">
       <button
-        disabled={$isValidating || $isSubmitting}
-        class="px-4 py-2.5 w-full
-                text-sm font-medium border rounded-lg
-                inline-flex items-center justify-center gap-2
-                hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-emerald-300">
+        class="btn-social"
+        disabled={$isValidating || $isSubmitting}>
         <IconGoogle class="w-5 h-5 aspect-1" />
         Sign up with Google
       </button>
 
       <button
-        disabled={$isValidating || $isSubmitting}
-        class="px-4 py-2.5 w-full
-                text-sm font-medium border rounded-lg
-                inline-flex items-center justify-center gap-2
-                hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-emerald-300">
+        class="btn-social"
+        disabled={$isValidating || $isSubmitting}>
         <IconMicrosoft class="w-5 h-5 aspect-1" />
         Sign up with Microsoft
       </button>

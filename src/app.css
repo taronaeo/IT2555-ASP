@@ -12,3 +12,13 @@
 body {
   font-family: 'DM Sans', sans-serif;
 }
+
+@layer components {
+  .btn-social {
+    @apply px-5 py-2.5 w-full
+            text-sm font-medium border rounded-lg
+            inline-flex items-center justify-center gap-2
+            hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-emerald-300
+            disabled:cursor-not-allowed disabled:opacity-75;
+  }
+}
