@@ -12,12 +12,12 @@ const schemaRegister = z
       .string()
       .min(6, 'Password too short, minimum 6 characters')
       .max(30, 'Password too long, maximum 30 characters'),
-    password_confirm: z
+    confirmPassword: z
       .string()
       .min(6, 'Password too short, minimum 6 characters')
       .max(30, 'Password too long, maximum 30 characters'),
   })
-  .refine((data) => data.password === data.password_confirm, {
+  .refine((data) => data.password === data.confirmPassword, {
     path: ['password_confirm'],
     message: 'Passwords do not match',
   });

@@ -6,18 +6,20 @@
   import { createForm } from 'svelte-forms-lib';
   import { schemaLogin, validateZod } from '$lib/forms';
 
-  import { auth } from '$lib/firebase';
   import {
-    indexedDBLocalPersistence,
-    setPersistence,
-    signInWithPopup,
-    signInWithEmailAndPassword,
-    OAuthProvider,
-    GoogleAuthProvider,
-    AuthErrorCodes,
-  } from 'firebase/auth';
+    signInEmailPassword,
+    signInGoogleSSO,
+    signInMicrosoftSSO,
+  } from '$lib/firebase/auth';
 
-  let firebaseError = '';
+  let errorMessage = '';
+  let isSSOLoading = false;
+
+  const ssoMiddleware = (sso: () => Promise<unknown>) => async () => {
+    isSSOLoading = true;
+    await sso().catch((message) => (errorMessage = message));
+    isSSOLoading = false;
+  };
 
   const {
     form,
@@ -34,51 +36,6 @@
     validate: (values) => validateZod(schemaLogin, values),
     onSubmit: ({ email, password }) => signInEmailPassword(email, password),
   });
-
-  async function signInEmailPassword(email: string, password: string) {
-    try {
-      await setPersistence(auth, indexedDBLocalPersistence);
-      await signInWithEmailAndPassword(auth, email, password);
-    } catch (error: any) {
-      switch (error.code) {
-        case AuthErrorCodes.USER_DELETED:
-        case AuthErrorCodes.INVALID_PASSWORD:
-          firebaseError = 'Invalid email or password, please try again';
-          break;
-        default:
-          firebaseError = 'Something went wrong, please try again in a while';
-          break;
-      }
-
-      console.error(error);
-    }
-  }
-
-  async function signInGoogleSSO() {
-    const provider = new GoogleAuthProvider();
-    provider.addScope('https://www.googleapis.com/auth/userinfo.email');
-    provider.addScope('https://www.googleapis.com/auth/userinfo.profile');
-
-    try {
-      await setPersistence(auth, indexedDBLocalPersistence);
-      await signInWithPopup(auth, provider);
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  async function signInMicrosoftSSO() {
-    const provider = new OAuthProvider('microsoft.com');
-    provider.addScope('email');
-    provider.addScope('profile');
-
-    try {
-      await setPersistence(auth, indexedDBLocalPersistence);
-      await signInWithPopup(auth, provider);
-    } catch (error) {
-      console.error(error);
-    }
-  }
 </script>
 
 <svelte:head>
@@ -102,17 +59,17 @@
 
       <div class="flex flex-col gap-2 md:flex-row">
         <button
-          on:click={signInGoogleSSO}
+          on:click={ssoMiddleware(signInGoogleSSO)}
           class="btn-social"
-          disabled={$isValidating || $isSubmitting}>
+          disabled={isSSOLoading || $isValidating || $isSubmitting}>
           <IconGoogle class="w-5 h-5 aspect-1" />
           Sign in with Google
         </button>
 
         <button
-          on:click={signInMicrosoftSSO}
+          on:click={ssoMiddleware(signInMicrosoftSSO)}
           class="btn-social"
-          disabled={$isValidating || $isSubmitting}>
+          disabled={isSSOLoading || $isValidating || $isSubmitting}>
           <IconMicrosoft class="w-5 h-5 aspect-1" />
           Sign in with Microsoft
         </button>
@@ -125,8 +82,8 @@
         or
       </p>
 
-      {#if firebaseError}
-        <Alert>{firebaseError}</Alert>
+      {#if errorMessage}
+        <Alert>{errorMessage}</Alert>
       {/if}
 
       <form class="space-y-6" on:submit|preventDefault={handleSubmit}>
@@ -143,7 +100,7 @@
             name="email"
             on:change={handleChange}
             bind:value={$form.email}
-            disabled={$isValidating || $isSubmitting}
+            disabled={isSSOLoading || $isValidating || $isSubmitting}
             placeholder="name@example.com"
             class="p-2.5 w-full block
                     border border-gray-300 rounded-lg
@@ -178,7 +135,7 @@
             name="password"
             on:change={handleChange}
             bind:value={$form.password}
-            disabled={$isValidating || $isSubmitting}
+            disabled={isSSOLoading || $isValidating || $isSubmitting}
             placeholder="••••••••"
             class="p-2.5 w-full block tracking-widest
                     border border-gray-300 rounded-lg
@@ -194,13 +151,13 @@
 
         <button
           type="submit"
-          disabled={$isValidating || $isSubmitting}
+          disabled={isSSOLoading || $isValidating || $isSubmitting}
           class="px-5 py-2.5 w-full rounded-lg
                   text-white text-center font-medium
                   bg-emerald-600 hover:bg-emerald-700
                   focus:outline-none focus:ring-4 focus:ring-green-300
                   disabled:cursor-not-allowed disabled:opacity-75">
-          {#if !($isValidating || $isSubmitting)}
+          {#if !(isSSOLoading || $isValidating || $isSubmitting)}
             Continue
           {:else}
             <AniIconLoading class="mx-auto w-6 h-6" fill="#fff" />
