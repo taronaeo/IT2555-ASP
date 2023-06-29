@@ -34,7 +34,11 @@
       password: '',
     },
     validate: (values) => validateZod(schemaLogin, values),
-    onSubmit: ({ email, password }) => signInEmailPassword(email, password),
+    onSubmit: async ({ email, password }) => {
+      await signInEmailPassword(email, password).catch(
+        (error) => (errorMessage = error)
+      );
+    },
   });
 </script>
 
@@ -166,7 +170,7 @@
 
         <div class="text-center">
           <a
-            href="/account/register"
+            href="/account/signup"
             class="font-medium text-sm text-emerald-600 hover:text-emerald-900">
             Create an account instead
           </a>
