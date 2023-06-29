@@ -254,9 +254,9 @@
 
             <div class="text-center">
               <a
-                href="/account/login"
+                href="/account/signin"
                 class="font-medium text-sm text-emerald-600 hover:text-emerald-900">
-                Have an account already? Login instead
+                Have an account already? Sign in instead
               </a>
             </div>
           </form>
