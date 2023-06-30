@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Logo } from '$lib/images';
+  import { Logo, LogoVendors } from '$lib/images';
   import {
     IconGoogle,
     IconMicrosoft,
@@ -76,7 +76,7 @@
 <!-- !        DO NOT DELETE LINE BELOW     -->
 <Logo class="w-0 h-0 invisible" />
 
-<section class="py-10 md:p-10 flex flex-col gap-8">
+<section class="py-10 md:p-10 flex flex-col gap-4">
   <div class="grid grid-cols-12 gap-8">
     <!-- Left half -->
     <div
@@ -267,9 +267,9 @@
 
   <div class="mx-auto flex flex-col space-y-1">
     <small class="text-center text-gray-500">Looking for other sign ups?</small>
-    <a href="/">
+    <a href="/vendor/signup">
       <!-- TODO: Replace with LogoForVendors -->
-      <Logo class="w-52" />
+      <LogoVendors class="w-52" />
     </a>
   </div>
 </section>

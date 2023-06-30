@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Logo } from '$lib/images';
+  import { Logo, LogoVendors } from '$lib/images';
   import { IconGoogle, IconMicrosoft, AniIconLoading } from '$lib/icons';
 
   import { Alert } from '$lib/components';
@@ -43,7 +43,7 @@
 </script>
 
 <svelte:head>
-  <title>Login | Dr. Receipt</title>
+  <title>Sign in | Dr. Receipt</title>
 </svelte:head>
 
 <section class="py-10 flex flex-col items-center">
@@ -177,5 +177,12 @@
         </div>
       </form>
     </div>
+  </div>
+
+  <div class="mt-4 mx-auto flex flex-col space-y-1">
+    <small class="text-center text-gray-500">Looking for vendor sign in?</small>
+    <a href="/vendor/signin">
+      <LogoVendors class="w-52" />
+    </a>
   </div>
 </section>
