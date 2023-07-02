@@ -26,4 +26,4 @@ setGlobalOptions({
   maxInstances: 1,
 });
 
-// export * from './handlers/onBeforeUserCreated';
+export * from './handlers/onBeforeUserCreated';

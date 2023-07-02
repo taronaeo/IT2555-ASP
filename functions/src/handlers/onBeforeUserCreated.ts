@@ -17,30 +17,29 @@ export const onBeforeUserCreated = beforeUserCreated(async (event) => {
     data: {
       uid,
       tenantId,
-      photoURL,
-      displayName,
-      email,
       emailVerified,
+      email,
       phoneNumber,
+      displayName,
+      photoURL,
     },
   } = event;
 
-  const user = new User({
+  const user: User = {
     uid,
-    tenantId,
-    photoURL,
-    displayName,
-    email,
+    uen: null,
+    tenantId: tenantId ?? null,
     emailVerified,
-    phoneNumber,
+    email: email ?? null,
+    phoneNumber: phoneNumber ?? null,
+    displayName: displayName ?? null,
+    photoURL: photoURL ?? null,
     updatedAt: FieldValue.serverTimestamp(),
     createdAt: FieldValue.serverTimestamp(),
-  });
+  };
 
   try {
-    await firestore
-      .doc(`users/${user.uid}`)
-      .set(user.toObject(), { merge: true });
+    await firestore.doc(`users/${user.uid}`).set(user, { merge: true });
 
     logger.info(
       'onBeforeUserCreated:writeUser',
