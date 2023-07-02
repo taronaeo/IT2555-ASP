@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { AuthProvider } from 'firebase/auth';
   import { Logo, LogoVendors } from '$lib/images';
   import { IconGoogle, IconMicrosoft, AniIconLoading } from '$lib/icons';
 
@@ -7,17 +8,25 @@
   import { schemaLogin, validateZod } from '$lib/forms';
 
   import {
+    providerGoogle,
+    providerMicrosoft,
+    continueAuth,
+    continueProvider,
     signInEmailPassword,
-    signInGoogleSSO,
-    signInMicrosoftSSO,
   } from '$lib/firebase/auth';
 
   let errorMessage = '';
   let isSSOLoading = false;
 
-  const ssoMiddleware = (sso: () => Promise<unknown>) => async () => {
+  const ssoMiddleware = (provider: AuthProvider) => async () => {
     isSSOLoading = true;
-    await sso().catch((message) => (errorMessage = message));
+
+    try {
+      await continueAuth(() => continueProvider(provider));
+    } catch (error: any) {
+      errorMessage = error;
+    }
+
     isSSOLoading = false;
   };
 
@@ -35,7 +44,7 @@
     },
     validate: (values) => validateZod(schemaLogin, values),
     onSubmit: async ({ email, password }) => {
-      await signInEmailPassword(email, password).catch(
+      await continueAuth(() => signInEmailPassword(email, password)).catch(
         (error) => (errorMessage = error)
       );
     },
@@ -63,7 +72,7 @@
 
       <div class="flex flex-col gap-2 md:flex-row">
         <button
-          on:click={ssoMiddleware(signInGoogleSSO)}
+          on:click={ssoMiddleware(providerGoogle)}
           class="btn-social"
           disabled={isSSOLoading || $isValidating || $isSubmitting}>
           <IconGoogle class="w-5 h-5 aspect-1" />
@@ -71,7 +80,7 @@
         </button>
 
         <button
-          on:click={ssoMiddleware(signInMicrosoftSSO)}
+          on:click={ssoMiddleware(providerMicrosoft)}
           class="btn-social"
           disabled={isSSOLoading || $isValidating || $isSubmitting}>
           <IconMicrosoft class="w-5 h-5 aspect-1" />

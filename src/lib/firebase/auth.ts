@@ -1,5 +1,9 @@
+import type { AuthProvider, UserCredential } from 'firebase/auth';
+
 import { dev } from '$app/environment';
 import { FirebaseError } from '@firebase/util';
+
+import { AuthTenant, AuthErrorMessage } from '$lib/constants';
 
 import { auth } from '$lib/firebase';
 import {
@@ -8,103 +12,73 @@ import {
   signInWithPopup,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
   OAuthProvider,
   GoogleAuthProvider,
 } from 'firebase/auth';
 
-const ERROR_UNKNOWN = 'Something went wrong, please try again in a while';
-const ERROR_RATE_LIMIT = "You're too fast, slow down and try again in a while";
-const ERROR_EMAIL_EXISTS = 'Email already exists, please login instead';
-const ERROR_INVALID_ACCOUNT = 'Invalid email or password, please try again';
+type TenantId = AuthTenant | null;
 
-async function signOut() {
-  try {
-    await _signOut(auth);
-  } catch (error) {
-    if (dev) console.error(error);
-  }
+const providerGoogle = new GoogleAuthProvider();
+providerGoogle.addScope('https://www.googleapis.com/auth/userinfo.email');
+providerGoogle.addScope('https://www.googleapis.com/auth/userinfo.profile');
+
+const providerMicrosoft = new OAuthProvider('microsoft.com');
+providerMicrosoft.addScope('email');
+providerMicrosoft.addScope('profile');
+
+function signOut() {
+  return _signOut(auth);
 }
 
-async function signUpEmailPassword(email: string, password: string) {
+function continueProvider(provider: AuthProvider) {
+  return signInWithPopup(auth, provider);
+}
+
+function signUpEmailPassword(email: string, password: string) {
+  return createUserWithEmailAndPassword(auth, email, password);
+}
+
+function signInEmailPassword(email: string, password: string) {
+  return signInWithEmailAndPassword(auth, email, password);
+}
+
+function emailPasswordReset(email: string) {
+  return sendPasswordResetEmail(auth, email);
+}
+
+function confirmPasswordReset() {
+  throw new Error('NOT_IMPLEMENTED');
+}
+
+async function continueAuth(
+  cb: () => Promise<UserCredential | void>,
+  tenantId: TenantId = null
+) {
   try {
-    return await createUserWithEmailAndPassword(auth, email, password);
-  } catch (error) {
+    auth.tenantId = tenantId;
+    await cb();
+  } catch (error: unknown) {
     if (dev) console.error(error);
-    if (!(error instanceof FirebaseError)) throw ERROR_UNKNOWN;
+    if (!(error instanceof FirebaseError)) throw AuthErrorMessage.UNKNOWN;
 
     switch (error.code) {
       case 'auth/error-code:-47':
-        throw ERROR_RATE_LIMIT;
+        throw AuthErrorMessage.RATE_LIMIT;
       case AuthErrorCodes.EMAIL_EXISTS:
-        throw ERROR_EMAIL_EXISTS;
-      default:
-        throw ERROR_UNKNOWN;
-    }
-  }
-}
-
-async function signInEmailPassword(email: string, password: string) {
-  try {
-    return await signInWithEmailAndPassword(auth, email, password);
-  } catch (error) {
-    if (dev) console.error(error);
-    if (!(error instanceof FirebaseError)) throw ERROR_UNKNOWN;
-
-    switch (error.code) {
-      case 'auth/error-code:-47':
-        throw ERROR_RATE_LIMIT;
+        throw AuthErrorMessage.EMAIL_EXISTS;
       case AuthErrorCodes.USER_DELETED:
       case AuthErrorCodes.INVALID_PASSWORD:
-        throw ERROR_INVALID_ACCOUNT;
-      default:
-        throw ERROR_UNKNOWN;
-    }
-  }
-}
-
-async function signInGoogleSSO() {
-  const provider = new GoogleAuthProvider();
-  provider.addScope('https://www.googleapis.com/auth/userinfo.email');
-  provider.addScope('https://www.googleapis.com/auth/userinfo.profile');
-
-  try {
-    return await signInWithPopup(auth, provider);
-  } catch (error) {
-    if (dev) console.error(error);
-    if (!(error instanceof FirebaseError)) throw ERROR_UNKNOWN;
-
-    switch (error.code) {
-      case 'auth/error-code:-47':
-        throw ERROR_RATE_LIMIT;
+        throw AuthErrorMessage.INVALID_ACCOUNT;
       case AuthErrorCodes.POPUP_CLOSED_BY_USER:
         break;
       default:
-        throw ERROR_UNKNOWN;
+        throw AuthErrorMessage.UNKNOWN;
     }
   }
 }
 
-async function signInMicrosoftSSO() {
-  const provider = new OAuthProvider('microsoft.com');
-  provider.addScope('email');
-  provider.addScope('profile');
-
-  try {
-    return await signInWithPopup(auth, provider);
-  } catch (error) {
-    if (dev) console.error(error);
-    if (!(error instanceof FirebaseError)) throw ERROR_UNKNOWN;
-
-    switch (error.code) {
-      case 'auth/error-code:-47':
-        throw ERROR_RATE_LIMIT;
-      case AuthErrorCodes.POPUP_CLOSED_BY_USER:
-        break;
-      default:
-        throw ERROR_UNKNOWN;
-    }
-  }
-}
-
-export { signInGoogleSSO, signInMicrosoftSSO };
-export { signOut, signUpEmailPassword, signInEmailPassword };
+export { continueAuth };
+export { providerGoogle, providerMicrosoft };
+export { signOut, continueProvider, signUpEmailPassword, signInEmailPassword };
+export { emailPasswordReset, confirmPasswordReset };

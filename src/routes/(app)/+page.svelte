@@ -2,10 +2,11 @@
   import { goto } from '$app/navigation';
   import { authStore } from '$lib/stores';
 
-  import { signOut } from '$lib/firebase/auth';
+  import { AuthTenant } from '$lib/constants';
+  import { signOut, continueAuth } from '$lib/firebase/auth';
 
   async function onSignOut() {
-    await signOut();
+    await continueAuth(signOut);
     await goto('/account/signin');
   }
 </script>
@@ -19,6 +20,12 @@
 
   {#if $authStore !== null}
     <button on:click={onSignOut}>Logout</button>
+  {/if}
+
+  {#if $authStore?.tenantId === null}
+    <h1>You're a normal user</h1>
+  {:else if $authStore?.tenantId === AuthTenant.VENDOR}
+    <h1>You're a tenant user</h1>
   {/if}
 
   <h1 class="text-4xl font-bold">Welcome to IT2555 - App Sec Project</h1>

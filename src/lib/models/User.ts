@@ -1,14 +1,14 @@
 import type { Metadata } from '$lib/models';
 
-interface User {
+interface User extends Metadata {
   readonly uid: string;
+  readonly uen: string | null;
   readonly tenantId: string | null;
-  photoURL: string | null;
-  displayName: string | null;
+  readonly emailVerified: boolean;
   email: string | null;
-  emailVerified: boolean;
   phoneNumber: string | null;
-  metadata: Metadata;
+  displayName: string | null;
+  photoURL: string | null;
 }
 
 export type { User };

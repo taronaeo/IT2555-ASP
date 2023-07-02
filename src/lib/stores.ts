@@ -4,7 +4,7 @@ import { readable } from 'svelte/store';
 import { onAuthStateChanged } from 'firebase/auth';
 
 import { auth } from '$lib/firebase';
-import { usersCol, createStreamDoc } from '$lib/firebase/firestore';
+import { colUsers, createStreamDoc } from '$lib/firebase/firestore';
 
 export const authStore = readable<User | null>(undefined, (set) => {
   if (typeof window === 'undefined') return;
@@ -13,7 +13,7 @@ export const authStore = readable<User | null>(undefined, (set) => {
     (user) => {
       if (!user) return set(null);
 
-      const { stream } = createStreamDoc(usersCol, user.uid);
+      const { stream } = createStreamDoc(colUsers, user.uid);
       stream(set);
     },
     (err) => console.error(err)
