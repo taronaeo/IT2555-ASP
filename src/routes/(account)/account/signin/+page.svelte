@@ -1,9 +1,12 @@
 <script lang="ts">
   import type { AuthProvider } from 'firebase/auth';
+  import type { FormState } from '$lib/forms';
+
   import { Logo, LogoVendors } from '$lib/images';
   import { IconGoogle, IconMicrosoft, AniIconLoading } from '$lib/icons';
 
   import { Alert } from '$lib/components';
+  import { writable } from 'svelte/store';
   import { createForm } from 'svelte-forms-lib';
   import { schemaLogin, validateZod } from '$lib/forms';
 
@@ -15,19 +18,17 @@
     signInEmailPassword,
   } from '$lib/firebase/auth';
 
-  let errorMessage = '';
-  let isSSOLoading = false;
+  const formState = writable<FormState>({
+    isLoading: false,
+    errorMessage: '',
+  });
 
-  const ssoMiddleware = (provider: AuthProvider) => async () => {
-    isSSOLoading = true;
+  const onSSO = (provider: AuthProvider) => async () => {
+    await continueAuth(() => continueProvider(provider), formState);
+  };
 
-    try {
-      await continueAuth(() => continueProvider(provider));
-    } catch (error: any) {
-      errorMessage = error;
-    }
-
-    isSSOLoading = false;
+  const onSubmit = async (email: string, password: string) => {
+    await continueAuth(() => signInEmailPassword(email, password), formState);
   };
 
   const {
@@ -43,11 +44,7 @@
       password: '',
     },
     validate: (values) => validateZod(schemaLogin, values),
-    onSubmit: async ({ email, password }) => {
-      await continueAuth(() => signInEmailPassword(email, password)).catch(
-        (error) => (errorMessage = error)
-      );
-    },
+    onSubmit: ({ email, password }) => onSubmit(email, password),
   });
 </script>
 
@@ -72,17 +69,17 @@
 
       <div class="flex flex-col gap-2 md:flex-row">
         <button
-          on:click={ssoMiddleware(providerGoogle)}
+          on:click={onSSO(providerGoogle)}
           class="btn-social"
-          disabled={isSSOLoading || $isValidating || $isSubmitting}>
+          disabled={$formState.isLoading || $isValidating || $isSubmitting}>
           <IconGoogle class="w-5 h-5 aspect-1" />
           Sign in with Google
         </button>
 
         <button
-          on:click={ssoMiddleware(providerMicrosoft)}
+          on:click={onSSO(providerMicrosoft)}
           class="btn-social"
-          disabled={isSSOLoading || $isValidating || $isSubmitting}>
+          disabled={$formState.isLoading || $isValidating || $isSubmitting}>
           <IconMicrosoft class="w-5 h-5 aspect-1" />
           Sign in with Microsoft
         </button>
@@ -95,8 +92,8 @@
         or
       </p>
 
-      {#if errorMessage}
-        <Alert>{errorMessage}</Alert>
+      {#if $formState.errorMessage}
+        <Alert>{$formState.errorMessage}</Alert>
       {/if}
 
       <form class="space-y-6" on:submit|preventDefault={handleSubmit}>
@@ -113,7 +110,7 @@
             name="email"
             on:change={handleChange}
             bind:value={$form.email}
-            disabled={isSSOLoading || $isValidating || $isSubmitting}
+            disabled={$formState.isLoading || $isValidating || $isSubmitting}
             placeholder="name@example.com"
             class="p-2.5 w-full block
                     border border-gray-300 rounded-lg
@@ -148,7 +145,7 @@
             name="password"
             on:change={handleChange}
             bind:value={$form.password}
-            disabled={isSSOLoading || $isValidating || $isSubmitting}
+            disabled={$formState.isLoading || $isValidating || $isSubmitting}
             placeholder="••••••••"
             class="p-2.5 w-full block tracking-widest
                     border border-gray-300 rounded-lg
@@ -164,13 +161,13 @@
 
         <button
           type="submit"
-          disabled={isSSOLoading || $isValidating || $isSubmitting}
+          disabled={$formState.isLoading || $isValidating || $isSubmitting}
           class="px-5 py-2.5 w-full rounded-lg
                   text-white text-center font-medium
                   bg-emerald-600 hover:bg-emerald-700
                   focus:outline-none focus:ring-4 focus:ring-green-300
                   disabled:cursor-not-allowed disabled:opacity-75">
-          {#if !(isSSOLoading || $isValidating || $isSubmitting)}
+          {#if !($formState.isLoading || $isValidating || $isSubmitting)}
             Continue
           {:else}
             <AniIconLoading class="mx-auto w-6 h-6" fill="#fff" />

@@ -1,4 +1,6 @@
+import type { Writable } from 'svelte/store';
 import type { AuthProvider, UserCredential } from 'firebase/auth';
+import type { FormState } from '$lib/forms';
 
 import { dev } from '$app/environment';
 import { FirebaseError } from '@firebase/util';
@@ -53,28 +55,55 @@ function confirmPasswordReset() {
 
 async function continueAuth(
   cb: () => Promise<UserCredential | void>,
+  stateStore?: Writable<FormState>,
   tenantId: TenantId = null
 ) {
+  if (stateStore) {
+    stateStore.update((state) => ({ ...state, isLoading: true }));
+  }
+
   try {
     auth.tenantId = tenantId;
     await cb();
   } catch (error: unknown) {
     if (dev) console.error(error);
-    if (!(error instanceof FirebaseError)) throw AuthErrorMessage.UNKNOWN;
+    if (!stateStore) return;
 
-    switch (error.code) {
-      case 'auth/error-code:-47':
-        throw AuthErrorMessage.RATE_LIMIT;
-      case AuthErrorCodes.EMAIL_EXISTS:
-        throw AuthErrorMessage.EMAIL_EXISTS;
-      case AuthErrorCodes.USER_DELETED:
-      case AuthErrorCodes.INVALID_PASSWORD:
-        throw AuthErrorMessage.INVALID_ACCOUNT;
-      case AuthErrorCodes.POPUP_CLOSED_BY_USER:
-        break;
-      default:
-        throw AuthErrorMessage.UNKNOWN;
+    if (error instanceof FirebaseError) {
+      switch (error.code) {
+        case 'auth/error-code:-47':
+          stateStore.update((state) => ({
+            ...state,
+            errorMessage: AuthErrorMessage.RATE_LIMIT,
+          }));
+          break;
+        case AuthErrorCodes.EMAIL_EXISTS:
+          stateStore.update((state) => ({
+            ...state,
+            errorMessage: AuthErrorMessage.EMAIL_EXISTS,
+          }));
+          break;
+        case AuthErrorCodes.USER_DELETED:
+        case AuthErrorCodes.INVALID_PASSWORD:
+          stateStore.update((state) => ({
+            ...state,
+            errorMessage: AuthErrorMessage.INVALID_ACCOUNT,
+          }));
+          break;
+        case AuthErrorCodes.POPUP_CLOSED_BY_USER:
+          break;
+        default:
+          stateStore.update((state) => ({
+            ...state,
+            errorMessage: AuthErrorMessage.UNKNOWN,
+          }));
+          break;
+      }
     }
+  }
+
+  if (stateStore) {
+    stateStore.update((state) => ({ ...state, isLoading: false }));
   }
 }
 
