@@ -1,23 +1,27 @@
-import type { User } from '$lib/models';
+import type { User as UserDoc } from '$lib/models';
+import type { User as AuthUser } from 'firebase/auth';
 
-import { readable } from 'svelte/store';
+import { doc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
+import { derived, readable, type Readable } from 'svelte/store';
 
 import { auth } from '$lib/firebase';
-import { colUsers, createStreamDoc } from '$lib/firebase/firestore';
+import { colUsers, docStore } from '$lib/firebase/firestore';
 
-export const authStore = readable<User | null>(undefined, (set) => {
+const authState = readable<AuthUser | null>(undefined, (set) => {
   if (typeof window === 'undefined') return;
-  const unsubscribe = onAuthStateChanged(
-    auth,
-    (user) => {
-      if (!user) return set(null);
 
-      const { stream } = createStreamDoc(colUsers, user.uid);
-      stream(set);
-    },
-    (err) => console.error(err)
-  );
-
+  const unsubscribe = onAuthStateChanged(auth, set);
   return unsubscribe;
 });
+
+export const authStore: Readable<UserDoc | null | undefined> = derived(
+  authState,
+  ($user, set) => {
+    if (typeof window === 'undefined') return;
+    if (!$user) return set($user);
+
+    const ref = doc(colUsers, $user.uid);
+    return docStore<UserDoc>(ref).subscribe(set);
+  }
+);
