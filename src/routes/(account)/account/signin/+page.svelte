@@ -3,9 +3,9 @@
   import type { FormState } from '$lib/forms';
 
   import { Logo, LogoVendors } from '$lib/images';
+  import { Alert, SocialLogin } from '$lib/components';
   import { IconGoogle, IconMicrosoft, AniIconLoading } from '$lib/icons';
 
-  import { Alert } from '$lib/components';
   import { writable } from 'svelte/store';
   import { createForm } from 'svelte-forms-lib';
   import { schemaLogin, validateZod } from '$lib/forms';
@@ -68,21 +68,19 @@
       </h1>
 
       <div class="flex flex-col gap-2 md:flex-row">
-        <button
+        <SocialLogin
           on:click={onSSO(providerGoogle)}
-          class="btn-social"
           disabled={$formState.isLoading || $isValidating || $isSubmitting}>
           <IconGoogle class="w-5 h-5 aspect-1" />
           Sign in with Google
-        </button>
+        </SocialLogin>
 
-        <button
+        <SocialLogin
           on:click={onSSO(providerMicrosoft)}
-          class="btn-social"
           disabled={$formState.isLoading || $isValidating || $isSubmitting}>
           <IconMicrosoft class="w-5 h-5 aspect-1" />
           Sign in with Microsoft
-        </button>
+        </SocialLogin>
       </div>
 
       <p
