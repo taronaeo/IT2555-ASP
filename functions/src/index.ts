@@ -18,6 +18,8 @@
 //   response.send("Hello from Firebase!");
 // });
 
+// Auto-init Firebase Admin
+import './firebase';
 import { setGlobalOptions } from 'firebase-functions/v2';
 
 setGlobalOptions({

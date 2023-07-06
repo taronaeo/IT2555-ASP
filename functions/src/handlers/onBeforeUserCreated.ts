@@ -1,17 +1,11 @@
 import * as logger from 'firebase-functions/logger';
-
-import { initializeApp } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
 import { beforeUserCreated } from 'firebase-functions/v2/identity';
 
-import { User } from '../models/User';
-import { FieldValue } from '../models/Metadata';
+import { firestore } from '../firebase';
+import { User, FieldValue } from '../models';
 
 export const onBeforeUserCreated = beforeUserCreated(async (event) => {
   logger.info('onBeforeUserCreated:init', 'Cloud Function called');
-
-  const app = initializeApp();
-  const firestore = getFirestore(app);
 
   const {
     data: {

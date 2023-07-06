@@ -5,4 +5,5 @@ interface Metadata {
   readonly createdAt: FieldValue;
 }
 
-export { Metadata, FieldValue };
+export type { Metadata };
+export { FieldValue };
