@@ -1,5 +1,5 @@
 const USER = null;
-const VENDOR = 'vendors-xhdjt';
+const VENDOR = 'vendors-kjv3b';
 const SUPPORT = 'NOT_IMPLEMENTED';
 
 export type AuthTenant = typeof USER | typeof VENDOR | typeof SUPPORT;
