@@ -15,10 +15,6 @@ export interface Vendor {
      * Location of Vendor
      */ 
     readonly 'vendorLocation': string;
-    /**
-     * @readonly
-     * Postal Code of Location
-     */
-    readonly 'postalCode': number;
 
+    readonly 'postalCode': number;
   }

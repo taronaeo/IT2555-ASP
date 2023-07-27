@@ -1,10 +1,11 @@
 <script>
     import { firestore } from '$lib/firebase'
     import { goto } from '$app/navigation'
-    import { getDoc, doc, setDoc, addDoc, collection, onSnapshot, serverTimestamp, query, orderBy, FieldValue, limit } from 'firebase/firestore'
+    import { getDoc, doc } from 'firebase/firestore'
     import { page } from '$app/stores';
     import { authStore } from '$lib/stores';
     import { getStorage, ref, getDownloadURL } from "firebase/storage";
+    import { AniIconLoading } from '$lib/icons'
   
 
     const storage = getStorage()
@@ -39,7 +40,9 @@
 <div class=" border-t-4 border-emerald-600 bg-slate-400">
 
     {#await promise}
-        Loading...
+        <div class="bg-white h-full flex items-center justify-center">
+            <AniIconLoading fill="#059669"></AniIconLoading>
+        </div>
         {:then receipt_data}
         <div class=" whitespace-normal m-auto col-span-2 md:col-span-1  bg-white py-6 shadow-lg">
             <div class="text-center"> <!--Div for header-->
