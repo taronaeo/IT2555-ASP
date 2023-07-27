@@ -1,24 +1,28 @@
 <script>
+  import {firestore} from '$lib/firebase'
+  import { collection ,query,where,getDocs} from 'firebase/firestore'
   import { onMount } from 'svelte';
-    let receipts = [
-      { id: 1, vendor: 'NTUC', date: '2023-01-01', time: '09:30 AM', totalCost: '$50.00' },
-      { id: 2, vendor: 'Cold Storage', date: '2022-02-02', time: '11:45 AM', totalCost: '$25.99' },
-      { id: 3, vendor: '7/11', date: '2022-03-03', time: '02:15 PM', totalCost: '$15.00' },
-      { id: 4, vendor: 'Toys R US', date: '2022-03-04', time: '10:00 AM', totalCost: '$75.50' },
-      { id: 5, vendor: 'Mc Donalds', date: '2022-04-05', time: '04:30 PM', totalCost: '$12.99' },
-      { id: 6, vendor: 'NTUC', date: '2023-01-06', time: '01:45 PM', totalCost: '$32.00' },
-      { id: 7, vendor: 'KFC', date: '2023-05-07', time: '09:30 AM', totalCost: '$20.00' },
-      { id: 8, vendor: 'Bread Talk', date: '2023-05-08', time: '12:15 PM', totalCost: '$10.99' },
-      { id: 9, vendor: 'Burger King', date: '2023-9-09', time: '03:45 PM', totalCost: '$45.50' },
-      { id: 10, vendor: 'Challenger', date: '2023-10-10', time: '09:30 AM', totalCost: '$65.99' },
-      { id: 11, vendor: 'Cheers', date: '2023-11-11', time: '02:00 PM', totalCost: '$22.00' },
-      { id: 12, vendor: 'Cotton On', date: '2023-12-12', time: '11:30 AM', totalCost: '$18.99' },
-      { id: 13, vendor: 'uni qlo', date: '2023-7-12', time: '11:30 AM', totalCost: '$28.99' },
-      { id: 14, vendor: 'Gucci', date: '2021-5-16', time: '11:30 AM', totalCost: '$49.99' },
-      { id: 15, vendor: 'Rolex', date: '2021-5-27', time: '12:30 AM', totalCost: '19999.99' },
-      { id: 16, vendor: 'Apple', date: '2021-5-13', time: '1:30 PM', totalCost: '$999.99' },
-      { id: 17, vendor: 'Texas Chicken', date: '2023-5-12', time: '11:30 AM', totalCost: '$9.99' },
-    ];
+  import { authStore } from '$lib/stores';
+
+  let receipts = [];
+  let UserUid = $authStore?.uid
+  const receiptsRef = collection(firestore, "receipts");
+  const users = collection(firestore,"users")
+
+  const q = query(
+    receiptsRef, 
+    where("userUid","==", UserUid), 
+    );
+
+  (async () => {
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      receipts.push({...doc.data(), id: doc.id});
+    });
+    console.log(querySnapshot.docs.map(d => d.data()))
+    filterReceipts();
+  })();
+    
     let year = "" ;
     let month = "" ;
     let searchQuery = '';
@@ -39,7 +43,7 @@
 
       const yearMatch = year === "" || receiptYear === year;
       const monthMatch = month === "" || receiptMonth === month; 
-      const vendorMatch = receipt.vendor.toLowerCase().includes(searchQuery.toLowerCase());
+      const vendorMatch = receipt.vendor.vendorName.toLowerCase().includes(searchQuery.toLowerCase());
 
       return yearMatch && monthMatch && vendorMatch;
     });
@@ -48,9 +52,16 @@
     updateDisplayedReceipts();
   }
   
-    function handleFileInput(event) {
-      evidence = event.target.files[0];
-    }
+  function handleFileInput(event) {
+  evidence = event.target.files[0];
+  const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.pdf)$/i;
+  
+  if(!allowedExtensions.exec(evidence.name)){
+    alert('Invalid file type');
+    event.target.value = '';
+    return false;
+  }
+}
   
     function handleDescriptionInput(event) {
       description = event.target.value;
@@ -87,8 +98,8 @@
   onMount(() => {
     closeConfirmation();
   });
-  </script>
-  
+</script>
+
   {#if showConfirmation}
   <div class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
     <div class="bg-white p-6 rounded-lg shadow-xl">
@@ -186,10 +197,10 @@
           class:bg-blue-200={selectedReceipt === receipt}
           on:click={() => selectedReceipt = receipt}
         >
-          <div class="text-lg font-medium mb-2">{receipt.vendor}</div>
+          <div class="text-lg font-medium mb-2">{receipt.vendor.vendorName}</div>
           <div class="text-sm text-gray-500 mb-1">Date: {receipt.date}</div>
           <div class="text-sm text-gray-500 mb-1">Time: {receipt.time}</div>
-          <div class="text-sm text-gray-500">Total Cost: {receipt.totalCost}</div>
+          <div class="text-sm text-gray-500">Total Cost: ${receipt.subtotal}</div>
         </div>
       {/each}
     </div>

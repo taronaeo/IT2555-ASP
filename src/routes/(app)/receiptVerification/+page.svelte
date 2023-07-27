@@ -1,45 +1,67 @@
 <script>
-    let fields = { receiptID: '', Total: '' };
-    let errors = { receiptID: '', Total: '' };
-    let valid = false;
-  
-    const submitHandler = () => {
-      valid = true;
-  
-      // Validation for receiptID
-      if (fields.receiptID.trim().length < 1) {
-        valid = false;
-        errors.receiptID = 'Receipt ID cannot be empty.';
-      } else if (isNaN(Number(fields.receiptID.trim())) || fields.receiptID.trim() === '') {
-        valid = false;
-        errors.receiptID = 'Receipt ID can only contain numbers';
-      } else if (fields.receiptID.length != 19){
-        valid = false;
-        errors.receiptID = 'Receipt ID should be 19 numbers in length'
-      } else {
-        errors.receiptID = '';
-      }
+  // Move the import statements inside the script tags
+  import { firestore } from '$lib/firebase';
+  import { collection, query, where, getDocs } from 'firebase/firestore';
 
-      // Validation for Total
-      const totalValue = Number(fields.Total.trim());
-      if (fields.Total.trim().length < 1) {
-        valid = false;
-        errors.Total = 'Total cannot be empty';
-      } else if (totalValue <= 0) {
-        valid = false;
-        errors.Total = 'Total must be greater than zero.';
-      } else if(isNaN(totalValue) || fields.Total.trim() === ''){
-        errors.Total = 'Total must be a number';
-      } else{
-        errors.Total = ''
-      }
-  
-      if (valid) {
+  // Move the variable declarations above the validation logic
+  let fields = { receiptID: '', Total: '' };
+  let errors = { receiptID: '', Total: '' };
+  let valid = false;
 
-        console.log('Valid form:', fields);
-      }
-    };
-  </script>
+  // Validation function
+  const validateForm = () => {
+    valid = true;
+    errors = { receiptID: '', Total: '' };
+
+    // Validation for receiptID
+    if (fields.receiptID.trim().length < 1) {
+      valid = false;
+      errors.receiptID = 'Receipt ID cannot be empty.';
+    } else if (isNaN(Number(fields.receiptID.trim())) || fields.receiptID.trim() === '') {
+      valid = false;
+      errors.receiptID = 'Receipt ID can only contain numbers';
+    } else if (fields.receiptID.length != 19) {
+      valid = false;
+      errors.receiptID = 'Receipt ID should be 19 numbers in length';
+    }
+
+    // Validation for Total
+    const totalValue = Number(fields.Total.trim());
+    if (fields.Total.trim().length < 1) {
+      valid = false;
+      errors.Total = 'Total cannot be empty';
+    } else if (totalValue <= 0 || isNaN(totalValue)) {
+      valid = false;
+      errors.Total = 'Total must be a positive number';
+    }
+  };
+
+  // Ensure receiptId and totalPrice are defined before using them in the query
+  let receiptId = 'your_receipt_id_value';
+  let totalPrice = 100; // replace with your actual total price value
+
+  const receiptsRef = collection(firestore, 'receipts');
+  const q = query(
+    receiptsRef,
+    where('receiptId', '==', receiptId),
+    where('total', '==', totalPrice)
+  );
+
+  (async () => {
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => console.log(doc.data()));
+  })();
+
+  const submitHandler = () => {
+    validateForm();
+    if (valid) {
+      console.log('Valid form:', fields);
+    } else {
+      console.log('Invalid form:', errors);
+    }
+  };
+</script>
+
   
 <div class="h-screen flex flex-col items-center">
   <div class="mt-10 w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2">
@@ -84,6 +106,13 @@
       </div>
     </form>
   </div>
+  
+  
+  
+  
+  
+  
+  
   <!--receipt-->
   {#if valid}
   <div class=" m-auto w-2/5 bg-white py-4 pt-20 shadow-xl">
