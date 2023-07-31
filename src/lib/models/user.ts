@@ -10,8 +10,6 @@ interface User extends Metadata {
   displayName: string | null;
   photoURL: string | null;
   vendorId: string | null;
-  vendorName: string | null;
-  apiKeys: Array<{branchId: string; branchLocation: string; branchPostal:number; key: string; secret: string}> | null
 }
 
 export type { User };

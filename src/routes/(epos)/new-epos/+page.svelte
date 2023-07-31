@@ -9,6 +9,8 @@
     import type { ReceiptItem } from "$lib/models/item";
     import type { Receipt } from "$lib/models/receipt";
 
+    import { FieldValue, serverTimestamp } from "firebase/firestore";
+
     let userUid:string = ''
 
     if(!$authStore){
@@ -47,43 +49,42 @@
         branchLocation: '33A Orchard Road, #03-13, Mandarin Gallery',
         branchPostal: 123123,
         key: 'spiderman',
-        secret: '12345'
+        secret: 'kurasaki'
 
     }
 
 
-    const food: {itemId: string; itemName: string; price: number}[] = [
-        {"itemId":"100000", "itemName": "Aglio Olio", "price": 16.50},
-        {"itemId": "100001", "itemName":"Carbonara", "price":18.50},
-        {"itemId": "100002", "itemName": "Ribeye 300g","price":30.00},
-        {"itemId": "100003", "itemName": "Ribeye 250g","price":25.30},
-        {"itemId": "100004", "itemName": "Sirloin 300g","price":25.50},
-        {"itemId": "100005", "itemName": "Rump 300g","price": 19.80},
-        {"itemId": "100006", "itemName": "Rump 400g","price": 16.50},
-        {"itemId": "100007", "itemName": "Margherita","price": 25.00},
-        {"itemId": "100008", "itemName": "Pepperoni","price": 28.00},
-        {"itemId": "100009", "itemName": "Salmon Fillet","price":16.40},
-        {"itemId": "100010", "itemName": "Chicken Chop","price": 18.20},
-        {"itemId": "100011", "itemName": "Lamb Chop","price":22.50},
-        {"itemId": "100012", "itemName": "Pork Chop","price":22.50},
-        {"itemId": "100013", "itemName": "Chicken Gizzard","price":28.30},
-        {"itemId": "100014", "itemName": "Beef Tongue","price": 15.30},
-        {"itemId": "100015", "itemName": "Cheese Burger","price": 16.30},
-        {"itemId": "100016", "itemName": "Ham Burger","price": 13.50},
-        {"itemId": "100017", "itemName": "Lamb Burger","price": 18.40},
-        {"itemId": "100018", "itemName": "Pork Burger","price": 16.50},
-        {"itemId": "100019", "itemName": "Chicken Burger","price": 13.50},
-        {"itemId": "100020", "itemName": "Mushroom Soup","price": 8.50},
-        {"itemId": "100021", "itemName": "Cream of Corn","price":6.50},
-        {"itemId": "100022", "itemName": "Chicken Soup","price":5.00},
-        {"itemId": "100023", "itemName": "French Fries","price":4.50},
-        {"itemId": "100024", "itemName": "Baked Potato","price":8.30},
-        {"itemId": "100025", "itemName": "Caesar Salad","price":5.00},
-        {"itemId": "100026", "itemName": "Coleslaw","price":6.00}
+    const food: {itemName: string; price: number}[] = [
+        {"itemName": "Aglio Olio", "price": 16.50},
+        {"itemName":"Carbonara", "price":18.50},
+        {"itemName": "Ribeye 300g","price":30.00},
+        {"itemName": "Ribeye 250g","price":25.30},
+        {"itemName": "Sirloin 300g","price":25.50},
+        {"itemName": "Rump 300g","price": 19.80},
+        {"itemName": "Rump 400g","price": 16.50},
+        {"itemName": "Margherita","price": 25.00},
+        {"itemName": "Pepperoni","price": 28.00},
+        {"itemName": "Salmon Fillet","price":16.40},
+        {"itemName": "Chicken Chop","price": 18.20},
+        {"itemName": "Lamb Chop","price":22.50},
+        {"itemName": "Pork Chop","price":22.50},
+        {"itemName": "Chicken Gizzard","price":28.30},
+        {"itemName": "Beef Tongue","price": 15.30},
+        {"itemName": "Cheese Burger","price": 16.30},
+        {"itemName": "Ham Burger","price": 13.50},
+        {"itemName": "Lamb Burger","price": 18.40},
+        {"itemName": "Pork Burger","price": 16.50},
+        {"itemName": "Chicken Burger","price": 13.50},
+        {"itemName": "Mushroom Soup","price": 8.50},
+        {"itemName": "Cream of Corn","price":6.50},
+        {"itemName": "Chicken Soup","price":5.00},
+        {"itemName": "French Fries","price":4.50},
+        {"itemName": "Baked Potato","price":8.30},
+        {"itemName": "Caesar Salad","price":5.00},
+        {"itemName": "Coleslaw","price":6.00}
 ]
 
     $:{
-        subtotal_float=0
         ordered_items.forEach(item=>{
             console.log(ordered_items)
             quantity_of_item+=1
@@ -100,7 +101,7 @@
             subtotal_float = Math.round(subtotal_float * 100) / 100
             gst_float = subtotal_float*0.08
             gst_float = Math.round(gst_float * 100) / 100
-            total_float = gst_float + subtotal_float
+            total_float = Math.round((gst_float + subtotal_float)*100/100)
 
         })
         subtotal_str = '$' + subtotal_float.toFixed(2)
@@ -120,18 +121,15 @@
 
         let final_items:ReceiptItem[]= []
         ordered_items.forEach(item =>{
-            let item_id: string = '';
             let item_price: number = 0;
 
             food.forEach(food_item =>{
                 if(food_item['itemName'] === item['item']){
-                    item_id = food_item['itemId']
                     item_price = food_item['price']
                 }
             })
 
-          let receipt_item:{itemId: string; itemName: string; price: number} = {
-            'itemId': item_id,
+          let receipt_item:{itemName: string; price: number} = {
             'itemName': item['item'],
             'price': item_price
           } satisfies ReceiptItem   
@@ -141,11 +139,8 @@
 
         })
 
-        const current_date:Date = new Date();
-        const date: string = (current_date).toISOString().split('T')[0];
-        const time: string = `${current_date.getHours()}:${current_date.getMinutes()}`
         
-        let receipt: {userUid: string;vendor: {vendorId: string; vendorName: string;}; branchLocation: string; branchId: string; branchPostal: number; items:ReceiptItem[]; subtotal: number; gst: number; total: number; date: string; time: string; paymentMethod: string; change: number} = {
+        let receipt: {userUid: string;vendor: {vendorId: string; vendorName: string;}; branchLocation: string; branchId: string; branchPostal: number; items:ReceiptItem[]; subtotal: number; gst: number; total: number; paymentMethod: string; change: number} = {
             userUid: userUid,
             vendor: {
                 vendorId: vendor_info['vendorId'],
@@ -158,8 +153,6 @@
             subtotal: subtotal_float,
             gst: gst_float,
             total: total_float,
-            date: date,
-            time: time,
             paymentMethod: payment_method,
             change: 0,
             

@@ -1,13 +1,14 @@
 import type { RequestEvent } from './$types';
 import { json, error } from '@sveltejs/kit';
 import { firestore } from '$lib/firebase';
-import { collection, query, where, getDocs, setDoc, doc } from 'firebase/firestore';
+import { collection, query, where, getDocs, setDoc, doc, FieldValue, serverTimestamp } from 'firebase/firestore';
 
-import type { Receipt } from '$lib/models/receipt'
+import type { Receipt } from '$lib/models/receipt';
+
 
 
 export const POST = async ({ request }: RequestEvent) => {
-  const userRef = collection(firestore, 'users');
+  const vendorRef = collection(firestore, 'vendors');
 
 
   const headers = request.headers;
@@ -16,19 +17,21 @@ export const POST = async ({ request }: RequestEvent) => {
   const data = await request.json();
   const userUid = data.userUid;
   const branchId = data.branchId;
-  const branchLocation = data.branchLocation;
-  const branchPostal = data.branchPostal;
+  const vendorId = data.vendor['vendorId'];
 
-
+  console.log(branchId)
+  console.log(api_key)
+  console.log(api_secret)
   const q = query(
-    userRef,
-    where('uid', '==', userUid),
+    vendorRef,
+    where('vendorId', '==', vendorId),
     where('apiKeys', 'array-contains', {
       branchId: branchId,
       key: api_key,
       secret: api_secret
     })
   );
+
 
 
   const querySnapshot = await getDocs(q);
@@ -39,7 +42,7 @@ export const POST = async ({ request }: RequestEvent) => {
   }
 
   const vendorLocation = data.branchLocation;
-  const vendorId = data.vendor['vendorId'];
+
   const vendorName = data.vendor['vendorName'];
   const postalCode = data.branchPostal;
 
@@ -48,8 +51,6 @@ export const POST = async ({ request }: RequestEvent) => {
   const gst = data.gst;
   const total = data.total;
   const change = data.change;
-  const time = data.time;
-  const date = data.date;
   const paymentMethod = data.paymentMethod;
 
   const receiptRef = doc(collection(firestore, 'receipts'));
@@ -68,8 +69,7 @@ export const POST = async ({ request }: RequestEvent) => {
     gst:gst,
     total: total,
     change: change,
-    date: date,
-    time: time,
+    createdAt: serverTimestamp(),
     paymentMethod: paymentMethod
   } satisfies Receipt);
   return json(data);

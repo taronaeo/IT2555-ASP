@@ -1,6 +1,4 @@
-import type { list } from "postcss";
-import type { ReceiptItem } from "./item";
-import type { Vendor } from "./vendor";
+import type { FieldValue } from "firebase/firestore"; 
 
 export interface Receipt {
     /**
@@ -12,17 +10,17 @@ export interface Receipt {
      * @readonly
      * Vendor Details
      */
-    readonly 'vendor': Vendor;
+    readonly 'vendor': {vendorId: string; vendorLocation: string; vendorName: string; postalCode: number;}
     /**
      * @readonly
      * Unique ID of User
      */
-    readonly 'userUid': string;
+    'userUid': string|null;
     /**
      * @readonly
      * Array of Items bought
      */
-    readonly 'items': ReceiptItem[] ;
+    readonly 'items': Array<{branchId: string; branchLocation: string; branchPostal:number; key: string; secret: string}>;
     /**
      * @readonly
      * Subtotal of Purchase
@@ -40,14 +38,9 @@ export interface Receipt {
     readonly 'total': number;
     /**
      * @readonly
-     * Date of purchase
+     * Receipt creation timestamp
      */
-    readonly 'date': string;
-    /**
-     * @readonly
-     * Time of purchase
-     */
-    readonly 'time': string;
+    readonly createdAt: FieldValue;
     /**
      * @readonly
      * Payment Method Used

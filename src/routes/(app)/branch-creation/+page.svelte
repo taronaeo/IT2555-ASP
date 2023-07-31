@@ -6,6 +6,7 @@
   import { AniIconLoading } from '$lib/icons'
 
   import { onMount } from 'svelte';
+  import { load } from '../../(account)/account/+page';
 
   let userUid:string = ""
 
@@ -15,6 +16,9 @@
   else{
       userUid = $authStore.uid
   }
+
+  let branches = [];
+  let displayed_branches = [];
 
   async function get_vendor_id(){
     const userRef = doc(firestore, "users", userUid);
@@ -30,52 +34,48 @@
     return vendor_id
     
   }
-  let branches = [];
-  let lastDoc = null;
-  onMount(() => {
-    loadBranches();
-  })  
-
+let loaded = false;
 async function loadBranches() {
-  const vendor_id = await get_vendor_id()
-  const branchRef = collection(firestore, `vendors/${vendor_id}/branches`);
-  const q = query(branchRef, orderBy('branchId', 'desc'), ...(lastDoc ? [startAfter(lastDoc)] : []), limit(6));
-  const querySnapshot = await getDocs(q);
-  const docs = querySnapshot.docs;
-  const data = docs.map(doc => doc.data());
+  const vendor_id = await get_vendor_id();
+  const vendorRef =  doc(firestore, "vendors", vendor_id);
+  const vendorSnap = await getDoc(vendorRef);
+  const data = vendorSnap.data();
+  data.branches.forEach(branch => {
+    branches.push(branch)
+  });
+  final_index= branches.length-1;
+  loaded = true;
+  if(branches.length>=6){
+    end_index=start_index+5;
+  }
+  else{
+    end_index=final_index;
+  }
 
-  lastDoc = docs[docs.length - 1];
-  branches = data;
 }
 
-  /*async function get_branches(){
-    const vendor_id = await get_vendor_id();
-    const branchRef = collection(firestore, `vendors/${vendor_id}/branches`);
-    const q = query(branchRef, orderBy('branchId', 'desc'), ...(lastDoc ? [startAfter(lastDoc)] : []), limit(2));
-    const querySnapshot = await getDocs(q);
-    const docs = querySnapshot.docs;
-    const data = docs.map(doc => doc.data());
+let start_index:number = 0;
+let end_index:number = 0;
+let final_index = 0;
 
-    lastDoc = docs[docs.length - 1];
-    branches = data;
+function get_branches(){
+  displayed_branches.length = 0;
+  for(let i = start_index; i <=end_index; i++){
+    displayed_branches.push(branches[i])
   }
-  function display_branches(){
-    for (let i = start_index; i <= end_index; i++) {
-      displayed_branches.push(branches[i]);
-    }
-    return displayed_branches
-  }
-  function next_page(){
+  displayed_branches = displayed_branches
+}
+
+function next_page(){
     if(start_index>=final_index){
       return
     }
     start_index+=6
 
     for(let i = end_index; i<final_index; i++){end_index+=1}
+  
+    get_branches()
 
-    displayed_branches.length = 0;
-    displayed_branches = displayed_branches;
-    display_branches()
   } 
   function prev_page(){
     
@@ -83,13 +83,10 @@ async function loadBranches() {
       return
     }
     start_index-=6;
-    end_index = start_index+5
-    displayed_branches.length = 0;
-    displayed_branches = displayed_branches;
-    console.log(displayed_branches)
-    display_branches()*/
-  
-
+    end_index = start_index+5;
+    get_branches()
+  }
+  loadBranches().then(() => {get_branches()})
 </script>
 
 <div class="px-6">
@@ -146,25 +143,29 @@ async function loadBranches() {
         Current Branches
         </p>
       <div class="grid grid-cols-2 text-sm gap-2">
-
-          <div class="text-center col-span-2">
-            <AniIconLoading class="m-auto my-12" fill="#059669"></AniIconLoading>
-          </div>
-            {#each branches as branch}
-              <div class="border-2 p-2">
-                <ul>
-                  <li class="break-all">ID: {branch['branchId']}</li>
-                  <li class="break-all">Location: {branch['branchLocation']}</li>
-                  <li class="break-all">Postal Code: {branch['branchPostal']}</li>
-                </ul>
+            {#if !loaded}
+              <div class="text-center col-span-2">
+                <AniIconLoading class="m-auto my-12" fill="#059669"></AniIconLoading>
               </div>
-            {/each}
+
+            {:else}
+              {#each displayed_branches as branch}
+                <div class="border-2 p-2">
+                  <ul>
+                    <li class="break-all">ID: {branch['branchId']}</li>
+                    <li class="break-all">Location: {branch['branchLocation']}</li>
+                    <li class="break-all">Postal Code: {branch['branchPostal']}</li>
+                  </ul>
+                </div>
+              {/each}
+
+            {/if}
       </div>
       <div class="my-4">
-        <div on:click="{loadBranches}" class="inline-block mt-4 mx-4">
+        <div on:click="{prev_page}" class="inline-block mt-4 mx-4">
           <img src="chevron-left.svg" class="h-8">
         </div>
-        <div class="inline float-right mt-4 mx-4">
+        <div on:click ="{next_page}" class="inline float-right mt-4 mx-4">
         <img src="chevron-right.svg" class=" h-8">
         </div>
       </div>

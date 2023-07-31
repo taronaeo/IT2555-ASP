@@ -15,18 +15,20 @@
     
     const docRef = doc(firestore, 'receipts', current_receipt_id);
 
-    getDoc(docRef).then((receipt) =>{
-        if(!receipt.exists() || receipt.data().userUid != $authStore.uid){
-            goto('not_found')
-        }
-    
-    }).catch(err => console.log("Error occured"))
-
     async function docSnap(){
-        const snap = await getDoc(docRef)
-        const data = snap.data()
-        const fileSnap = await getDownloadURL(ref(storage, `VendorLogos/${data.vendor.vendorId}.svg`))
-        return [data, fileSnap]
+        try{
+            await getDoc(docRef)
+        }
+        catch{
+            goto('/')
+        }
+            const snap = await getDoc(docRef)
+            const data = snap.data()
+            const date_obj = data['createdAt'].toDate();
+            const date = (date_obj).toISOString().split('T')[0];
+            const time = `${date_obj.getHours()}:${date_obj.getMinutes()}`
+            const fileSnap = await getDownloadURL(ref(storage, `VendorLogos/${data.vendor.vendorId}.svg`))
+            return [data, fileSnap, date, time]
     }
     let promise = docSnap();
 
@@ -85,7 +87,7 @@
             
             <div class=""><hr class="border-t-2 border-black border-dashed my-2 mx-6"></div>
             <div class="mx-6 grid grid-cols-6"> <!--footer div-->
-                <div class="text-center col-span-6"><span>{receipt_data[0]['date']}</span> <span>{receipt_data[0]['time']}</span></div>
+                <div class="text-center col-span-6"><span>{receipt_data[2]}</span> <span>{receipt_data[3]}</span></div>
             </div>
 
         </div>
