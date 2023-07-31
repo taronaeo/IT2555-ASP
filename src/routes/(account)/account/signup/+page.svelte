@@ -43,17 +43,17 @@
     ],
   ];
 
-  const formState = writable<FormState>({
+  const state = writable<FormState>({
     isLoading: false,
     errorMessage: '',
   });
 
   const onSSO = (provider: AuthProvider) => async () => {
-    await continueAuth(() => continueProvider(provider), formState);
+    await continueAuth(() => continueProvider(provider), state);
   };
 
   const onSubmit = async (email: string, password: string) => {
-    await continueAuth(() => signUpEmailPassword(email, password), formState);
+    await continueAuth(() => signUpEmailPassword(email, password), state);
   };
 
   const {
@@ -129,14 +129,14 @@
           <div class="flex flex-col gap-2 md:flex-row">
             <SocialLogin
               on:click={onSSO(providerGoogle)}
-              disabled={$formState.isLoading || $isValidating || $isSubmitting}>
+              disabled={$state.isLoading || $isValidating || $isSubmitting}>
               <IconGoogle class="w-5 h-5 aspect-1" />
               Sign up with Google
             </SocialLogin>
 
             <SocialLogin
               on:click={onSSO(providerMicrosoft)}
-              disabled={$formState.isLoading || $isValidating || $isSubmitting}>
+              disabled={$state.isLoading || $isValidating || $isSubmitting}>
               <IconMicrosoft class="w-5 h-5 aspect-1" />
               Sign up with Microsoft
             </SocialLogin>
@@ -149,8 +149,8 @@
             or
           </p>
 
-          {#if $formState.errorMessage}
-            <Alert>{$formState.errorMessage}</Alert>
+          {#if $state.errorMessage}
+            <Alert>{$state.errorMessage}</Alert>
           {/if}
 
           <form class="space-y-6" on:submit|preventDefault={handleSubmit}>
@@ -165,12 +165,11 @@
                 id="email"
                 type="email"
                 name="email"
+                autocomplete="email"
+                placeholder="name@example.com"
                 on:change={handleChange}
                 bind:value={$form.email}
-                disabled={$formState.isLoading ||
-                  $isValidating ||
-                  $isSubmitting}
-                placeholder="name@example.com"
+                disabled={$state.isLoading || $isValidating || $isSubmitting}
                 class="p-2.5 w-full block
                         border border-gray-300 rounded-lg
                         bg-white text-gray-900 placeholder:text-gray-400
@@ -196,12 +195,11 @@
                 id="password"
                 type="password"
                 name="password"
+                autocomplete="new-password"
+                placeholder="••••••••"
                 on:change={handleChange}
                 bind:value={$form.password}
-                disabled={$formState.isLoading ||
-                  $isValidating ||
-                  $isSubmitting}
-                placeholder="••••••••"
+                disabled={$state.isLoading || $isValidating || $isSubmitting}
                 class="p-2.5 w-full block tracking-widest
                         border border-gray-300 rounded-lg
                         bg-white text-gray-900 placeholder:text-gray-400
@@ -227,12 +225,11 @@
                 id="password_confirm"
                 type="password"
                 name="password_confirm"
+                autocomplete="new-password"
+                placeholder="••••••••"
                 on:change={handleChange}
                 bind:value={$form.confirmPassword}
-                disabled={$formState.isLoading ||
-                  $isValidating ||
-                  $isSubmitting}
-                placeholder="••••••••"
+                disabled={$state.isLoading || $isValidating || $isSubmitting}
                 class="p-2.5 w-full block tracking-widest
                         border border-gray-300 rounded-lg
                         bg-white text-gray-900 placeholder:text-gray-400
@@ -249,13 +246,13 @@
 
             <button
               type="submit"
-              disabled={$formState.isLoading || $isValidating || $isSubmitting}
+              disabled={$state.isLoading || $isValidating || $isSubmitting}
               class="px-5 py-2.5 w-full rounded-lg
                       text-white text-center font-medium
                       bg-emerald-600 hover:bg-emerald-700
                       focus:outline-none focus:ring-4 focus:ring-green-300
                       disabled:cursor-not-allowed disabled:opacity-75">
-              {#if !($formState.isLoading || $isValidating || $isSubmitting)}
+              {#if !($state.isLoading || $isValidating || $isSubmitting)}
                 Create account
               {:else}
                 <AniIconLoading class="mx-auto w-6 h-6" fill="#fff" />

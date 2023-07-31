@@ -106,10 +106,11 @@
             id="email"
             type="email"
             name="email"
+            autocomplete="email"
+            placeholder="name@example.com"
             on:change={handleChange}
             bind:value={$form.email}
             disabled={$formState.isLoading || $isValidating || $isSubmitting}
-            placeholder="name@example.com"
             class="p-2.5 w-full block
                     border border-gray-300 rounded-lg
                     bg-white text-gray-900 placeholder:text-gray-400
@@ -141,10 +142,11 @@
             id="password"
             type="password"
             name="password"
+            autocomplete="current-password"
+            placeholder="••••••••"
             on:change={handleChange}
             bind:value={$form.password}
             disabled={$formState.isLoading || $isValidating || $isSubmitting}
-            placeholder="••••••••"
             class="p-2.5 w-full block tracking-widest
                     border border-gray-300 rounded-lg
                     bg-white text-gray-900 placeholder:text-gray-400
