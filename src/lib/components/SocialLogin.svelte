@@ -20,6 +20,6 @@
   on:mouseenter
   on:mouseleave
   class={btnClass}
-  {...$$props}>
+  {...$$restProps}>
   <slot />
 </button>
