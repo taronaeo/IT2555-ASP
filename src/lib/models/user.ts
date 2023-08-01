@@ -10,6 +10,8 @@ interface User extends Metadata {
   displayName: string | null;
   photoURL: string | null;
   isOnboarded: boolean;
+  vendorId: string | null;
+  
 }
 
 export type { User };
