@@ -1,20 +1,18 @@
-import type { Branches } from './Branches';
-import type { ApiKeys } from './ApiKeys';
 export interface Vendor {
-    /**
-     * @readonly
-     * Unique ID of vendor
-     */
-    readonly vendorId: string;
-    /**
-     * @readonly
-     * Name of vendor
-     */
-    readonly vendorName: string;
-    /**
-     * @readonly
-     * Location of Vendor
-     */ 
-    branches: Branches[] | null;
-    apiKeys: ApiKeys[] | null; 
-  }
+  readonly vendorId: string;
+  readonly vendorName: string;
+  branches: VendorBranch[] | null;
+  apiKeys: VendorApiKey[] | null;
+}
+
+export interface VendorBranch {
+  readonly branchId: string;
+  branchLocation: string;
+  branchPostal: number;
+}
+
+export interface VendorApiKey {
+  readonly branchId: string;
+  key: string;
+  secret: string;
+}
