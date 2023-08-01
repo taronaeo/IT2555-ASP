@@ -1,6 +1,6 @@
 import type { Metadata } from '$lib/models';
 
-interface User {
+interface User extends Metadata {
   readonly uid: string;
   readonly uen: string | null;
   readonly tenantId: string | null;
@@ -9,7 +9,7 @@ interface User {
   phoneNumber: string | null;
   displayName: string | null;
   photoURL: string | null;
-  metadata: Metadata;
+  isOnboarded: boolean;
 }
 
 export type { User };
