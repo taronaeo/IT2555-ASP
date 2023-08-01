@@ -1,8 +1,8 @@
 <script>
   import { Logo } from '$lib/images';
 
-  import { authStore } from '$lib/stores'
-  import { IconMenu, IconClose } from '$lib/icons'
+  import { authStore } from '$lib/stores';
+  import { IconMenu, IconClose } from '$lib/icons';
 
   let isDropdownActive = false;
 </script>

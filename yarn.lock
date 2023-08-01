@@ -2066,6 +2066,11 @@ depd@2.0.0, depd@^2.0.0, depd@~2.0.0:
   resolved "https://registry.yarnpkg.com/depd/-/depd-2.0.0.tgz#b696163cc757560d09cf22cc8fad1571b79e76df"
   integrity sha512-g7nH6P6dyDioJogAAGprGpCtVImJhpPk/roCzdb3fIh61/s/nPsfR6onyMwkCAR/OlC3yBC0lESvUoQEAssIrw==
 
+dequal@^2.0.2:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/dequal/-/dequal-2.0.3.tgz#2644214f1997d39ed0ee0ece72335490a7ac67be"
+  integrity sha512-0je+qPKHEMohvfRTCEo3CrPG6cAzAYgmzKyxRiYSSDkS6eGJdyVJm7WaYA5ECaAD9wLB2T4EEeymA5aFVcYXCA==
+
 destroy@1.2.0, destroy@^1.0.4:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/destroy/-/destroy-1.2.0.tgz#4803735509ad8be552934c67df614f94e66fa015"
@@ -2628,10 +2633,10 @@ find-up@^5.0.0:
     locate-path "^6.0.0"
     path-exists "^4.0.0"
 
-firebase-tools@^12.1.0:
-  version "12.3.1"
-  resolved "https://registry.yarnpkg.com/firebase-tools/-/firebase-tools-12.3.1.tgz#83f0e1e053230359f9c82790a5b07f0e0e356025"
-  integrity sha512-d1cJZSDx5XnYVxPyqcAN2VKwfgl9nBqkxjznxBS7FiNtTyPZXtVJhKHf5/mvcPIvHSU9UJPJRtEJScB2lNcWRw==
+firebase-tools@^12.4.0:
+  version "12.4.0"
+  resolved "https://registry.yarnpkg.com/firebase-tools/-/firebase-tools-12.4.0.tgz#d644888507ea6662c5bea51ba52903bafa83425d"
+  integrity sha512-ZWqi/z7gexbIh7/mLRGQ0Sr/+T1JR6jctUjBcCxcl/LLQ+vyziF+BwW6fRQLi/ofB6FYHR0XBCY7bhXH6brRjg==
   dependencies:
     "@google-cloud/pubsub" "^3.0.1"
     abort-controller "^3.0.0"
@@ -3754,6 +3759,11 @@ levn@~0.3.0:
   dependencies:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
+
+libphonenumber-js@^1.10.38:
+  version "1.10.38"
+  resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.10.38.tgz#edb9c1f13796ab17a8484180ef937184784628e9"
+  integrity sha512-4NjVXVUmpZ9Zsqq6FXa2+MKI+KAI3tOqA0pxXgXGluhpj4ge5didmbWJpMBqGB3AVGv1SnEtKdGTbxjSEG1kCQ==
 
 libsodium-wrappers@^0.7.10:
   version "0.7.11"
@@ -5497,6 +5507,13 @@ svelte-eslint-parser@^0.30.0:
     eslint-visitor-keys "^3.0.0"
     espree "^9.0.0"
 
+svelte-forms-lib@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/svelte-forms-lib/-/svelte-forms-lib-2.0.1.tgz#64895abacda4a98822d2ae52842a6b8f9aeebcb1"
+  integrity sha512-kwbJ3ynsepsrrJyAMrvSc0Lj/myc9vfI2DL8OKxgArZimrNYsRh1gENYhvrcKEI3BiZrv8q3VFfmGo/GMyk7Zg==
+  dependencies:
+    dequal "^2.0.2"
+
 svelte-hmr@^0.15.1:
   version "0.15.2"
   resolved "https://registry.yarnpkg.com/svelte-hmr/-/svelte-hmr-0.15.2.tgz#d2f6fc82e040f2734abd54cea5cbef46828f2538"
@@ -6141,3 +6158,8 @@ zip-stream@^4.1.0:
     archiver-utils "^2.1.0"
     compress-commons "^4.1.0"
     readable-stream "^3.6.0"
+
+zod@^3.21.4:
+  version "3.21.4"
+  resolved "https://registry.yarnpkg.com/zod/-/zod-3.21.4.tgz#10882231d992519f0a10b5dd58a38c9dabbb64db"
+  integrity sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==
