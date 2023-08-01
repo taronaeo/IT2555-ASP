@@ -1,4 +1,4 @@
-import type { Metadata } from "./metadata"; 
+import type { Metadata } from '$lib/models';
 
 interface User extends Metadata {
   readonly uid: string;
@@ -9,7 +9,7 @@ interface User extends Metadata {
   phoneNumber: string | null;
   displayName: string | null;
   photoURL: string | null;
-  vendorId: string | null;
+  isOnboarded: boolean;
 }
 
 export type { User };
