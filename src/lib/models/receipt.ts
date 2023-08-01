@@ -20,7 +20,7 @@ export interface Receipt {
      * @readonly
      * Array of Items bought
      */
-    readonly 'items': Array<{branchId: string; branchLocation: string; branchPostal:number; key: string; secret: string}>;
+    readonly 'items': Array<{itemName: string; price: number; discount: string|null; remarks: string|null;}>;
     /**
      * @readonly
      * Subtotal of Purchase
