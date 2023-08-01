@@ -28,11 +28,9 @@ export const onBeforeUserCreated = beforeUserCreated(async (event) => {
     phoneNumber: phoneNumber ?? null,
     displayName: displayName ?? null,
     photoURL: photoURL ?? null,
-    metadata: {
-      onboarded: false,
-      updatedAt: FieldValue.serverTimestamp(),
-      createdAt: FieldValue.serverTimestamp(),
-    },
+    isOnboarded: false,
+    updatedAt: FieldValue.serverTimestamp(),
+    createdAt: FieldValue.serverTimestamp(),
   };
 
   try {
