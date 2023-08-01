@@ -16,6 +16,7 @@
 	"dependencies": {
 		"@fontsource/dm-sans": "^5.0.3",
 		"firebase": "^9.22.1",
+		"libphonenumber-js": "^1.10.38",
 		"qr-image": "^3.2.0",
 		"svelte-forms-lib": "^2.0.1",
 		"zod": "^3.21.4"
