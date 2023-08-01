@@ -1,5 +1,5 @@
-import type { Branches } from './branches';
-import type { ApiKeys } from './apiKeys';
+import type { Branches } from './Branches';
+import type { ApiKeys } from './ApiKeys';
 export interface Vendor {
     /**
      * @readonly
