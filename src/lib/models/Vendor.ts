@@ -1,6 +1,10 @@
 export interface Vendor {
   readonly vendorId: string;
-  readonly vendorName: string;
+  readonly vendorUen: string;
+  vendorName: string;
+  vendorEmail: string;
+  vendorCategory: string;
+  vendorPhoneNumber: string;
   branches: VendorBranch[] | null;
   apiKeys: VendorApiKey[] | null;
 }
