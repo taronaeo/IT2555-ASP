@@ -22,6 +22,10 @@
       vendorName: '',
       vendorCategory: '',
       vendorPhoneNumber: '',
+      cardNumber: '',
+      cardExpMonth: '',
+      cardExpYear: '',
+      cardCvc: '',
     },
     validate: (data) => validateZod(schema, data),
     onSubmit: (data) => {
@@ -118,6 +122,50 @@
       disabled={$state.isLoading || $isValidating || $isSubmitting}
       on:change={handleChange}
       bind:value={$form.vendorPhoneNumber} />
+
+    <FormInput
+      id="cardNumber"
+      type="number"
+      label="Card Number"
+      labelClass="font-medium text-sm text-gray-900"
+      placeholder="4242 4242 4242 4242"
+      errorMessage={$errors.cardNumber}
+      disabled={$state.isLoading || $isValidating || $isSubmitting}
+      on:change={handleChange}
+      bind:value={$form.cardNumber} />
+
+    <FormInput
+      id="cardExpMonth"
+      type="number"
+      label="Card Expiry Month"
+      labelClass="font-medium text-sm text-gray-900"
+      placeholder="08"
+      errorMessage={$errors.cardExpMonth}
+      disabled={$state.isLoading || $isValidating || $isSubmitting}
+      on:change={handleChange}
+      bind:value={$form.cardExpMonth} />
+
+    <FormInput
+      id="cardExpYear"
+      type="number"
+      label="Card Expiry Year"
+      labelClass="font-medium text-sm text-gray-900"
+      placeholder="2023"
+      errorMessage={$errors.cardExpYear}
+      disabled={$state.isLoading || $isValidating || $isSubmitting}
+      on:change={handleChange}
+      bind:value={$form.cardExpYear} />
+
+    <FormInput
+      id="cardCvc"
+      type="number"
+      label="Card CVC"
+      labelClass="font-medium text-sm text-gray-900"
+      placeholder="314"
+      errorMessage={$errors.cardCvc}
+      disabled={$state.isLoading || $isValidating || $isSubmitting}
+      on:change={handleChange}
+      bind:value={$form.cardCvc} />
 
     <div class="flex flex-row justify-end">
       <button

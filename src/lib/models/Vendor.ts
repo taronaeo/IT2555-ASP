@@ -5,6 +5,12 @@ export interface Vendor {
   vendorEmail: string;
   vendorCategory: string;
   vendorPhoneNumber: string;
+
+  stripeId: string;
+  stripeSubscriptionId: string;
+  stripeStatus: string;
+  stripeItemId: string;
+
   branches: VendorBranch[] | null;
   apiKeys: VendorApiKey[] | null;
 }
