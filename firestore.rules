@@ -6,17 +6,48 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
+      allow create, delete: if false;
+
     	allow get:	if isAuthenticated()
       						&& request.auth.uid == userId;
+
+      allow update:	if isAuthenticated()
+      							&& isValidUpdate();
+
+      function isValidUpdate() {
+      	let affectedKeys = getRequestData().diff(resource.data).affectedKeys();
+        return affectedKeys.hasOnly(['email', 'phoneNumber', 'displayName', 'photoURL', 'isOnboarded', 'updatedAt'])
+        		&& getRequestData().email is string
+            && getRequestData().phoneNumber is string
+            && getRequestData().displayName is string
+            && getRequestData().photoURL is string
+            && getRequestData().isOnboarded is bool
+            && getRequestData().updatedAt is timestamp
+            && getRequestData().email.size() > 0
+            && getRequestData().phoneNumber.size() == 13
+            && (getRequestData().displayName.size() >= 3
+            && getRequestData().displayName.size() <= 30)
+            && ((getRequestData().isOnboarded == true && getResourceData().isOnboarded == false)
+            || (getRequestData().isOnboarded == true && getResourceData().isOnboarded == true))
+            && getRequestData().updatedAt.toMillis() == request.time.toMillis();
+      }
     }
 
     match /receipts/{receiptId} {
-  		allow read, write: if false;
+  		allow read: if request.auth != null && request.auth.uid == resource.data.userUid;
   	}
 
     function isAuthenticated() {
       return request.auth != null
           && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function getRequestData() {
+    	return request.resource.data;
+    }
+
+    function getResourceData() {
+    	return resource.data;
     }
   }
 }
