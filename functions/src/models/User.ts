@@ -2,8 +2,8 @@ import type { Metadata } from '../models/Metadata';
 
 interface User extends Metadata {
   readonly uid: string;
-  readonly uen: string | null;
   readonly tenantId: string | null;
+  readonly vendorId: string | null;
   readonly emailVerified: boolean;
   email: string | null;
   phoneNumber: string | null;
