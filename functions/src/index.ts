@@ -9,4 +9,5 @@ setGlobalOptions({
 });
 
 export * from './handlers/onBeforeUserCreated';
+export * from './callables/onVendorOnboardingCallable';
 // export * from './callables/onOnboardingCallable';
