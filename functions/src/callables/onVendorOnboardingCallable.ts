@@ -1,14 +1,21 @@
-import { FieldValue, type User, type Vendor } from '../models';
+import type { User, Vendor } from '../models';
 
 import * as logger from 'firebase-functions/logger';
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 
+import { stripe } from '../stripe';
 import { firestore } from '../firebase';
+import { FieldValue } from '../models';
 
 type VendorOnboarding = Pick<
   Vendor,
   'vendorUen' | 'vendorName' | 'vendorCategory' | 'vendorPhoneNumber'
->;
+> & {
+  cardNumber: string;
+  cardExpMonth: number;
+  cardExpYear: number;
+  cardCvc: string;
+};
 
 export const onVendorOnboardingCallable = onCall(
   async ({ auth, data, rawRequest }) => {
@@ -63,6 +70,10 @@ export const onVendorOnboardingCallable = onCall(
       vendorName,
       vendorCategory,
       vendorPhoneNumber,
+      cardNumber,
+      cardExpMonth,
+      cardExpYear,
+      cardCvc,
     }: VendorOnboarding = data;
 
     const vendorCategories = [
@@ -78,19 +89,50 @@ export const onVendorOnboardingCallable = onCall(
       typeof vendorName !== 'string' ||
       typeof vendorCategory !== 'string' ||
       typeof vendorPhoneNumber !== 'string' ||
+      typeof cardNumber !== 'string' ||
+      typeof cardExpMonth !== 'number' ||
+      typeof cardExpYear !== 'number' ||
+      typeof cardCvc !== 'string' ||
       vendorUen.length < 9 ||
       vendorUen.length > 10 ||
       vendorName.length === 0 ||
       !vendorCategories.includes(vendorCategory) ||
-      vendorPhoneNumber.length === 0
+      vendorPhoneNumber.length === 0 ||
+      cardNumber.length === 0 ||
+      cardCvc.length === 0
     ) {
       throw new HttpsError(
         'invalid-argument',
-        `Function must be called with
-          arguments 'vendorUen', 'vendorName', 'vendorCategory',
-          'vendorPhoneNumber'`
+        'Missing information, please try again later'
       );
     }
+
+    const stripeCustomer = await stripe.customers.create({
+      name: vendorName,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      email: userData.email!,
+      phone: vendorPhoneNumber,
+      metadata: { firebaseUserId: auth.uid },
+    });
+
+    const paymentMethod = await stripe.paymentMethods.create({
+      type: 'card',
+      card: {
+        number: cardNumber,
+        exp_month: cardExpMonth,
+        exp_year: cardExpYear,
+        cvc: cardCvc,
+      },
+    });
+
+    await stripe.paymentMethods.attach(paymentMethod.id, {
+      customer: stripeCustomer.id,
+    });
+
+    const stripeSub = await stripe.subscriptions.create({
+      customer: stripeCustomer.id,
+      items: [{ plan: 'price_1NU1xvFc4RNZ7rpe4nfMwvCX' }],
+    });
 
     const newVendorData: Vendor = {
       vendorId: vendorRef.id,
@@ -100,6 +142,10 @@ export const onVendorOnboardingCallable = onCall(
       vendorEmail: userData.email!,
       vendorCategory,
       vendorPhoneNumber,
+      stripeId: stripeCustomer.id,
+      stripeStatus: stripeSub.status,
+      stripeItemId: stripeSub.items.data[0].id,
+      stripeSubscriptionId: stripeSub.id,
       branches: [],
       apiKeys: [],
     };
