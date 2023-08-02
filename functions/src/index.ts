@@ -8,5 +8,6 @@ setGlobalOptions({
   maxInstances: 1,
 });
 
+export * from './http/onHttpReceiptSubmit';
 export * from './handlers/onBeforeUserCreated';
 // export * from './callables/onOnboardingCallable';
