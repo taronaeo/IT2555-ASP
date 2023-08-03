@@ -8,7 +8,13 @@ setGlobalOptions({
   maxInstances: 1,
 });
 
-export * from './http/onHttpReceiptSubmit';
+// Auth Blocking Functions
 export * from './handlers/onBeforeUserCreated';
+
+// Background Event Functions
+export * from './events/onReceiptCreatedEvent';
+
+// HTTP Functions
+export * from './http/onHttpReceiptSubmit';
+export * from './callables/onVendorOnboardingCallable';
 export * from './callables/onReceiptViewCallable';
-// export * from './callables/onOnboardingCallable';

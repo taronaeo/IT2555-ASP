@@ -21,8 +21,8 @@ export const onBeforeUserCreated = beforeUserCreated(async (event) => {
 
   const user: User = {
     uid,
-    uen: null,
     tenantId: tenantId ?? null,
+    vendorId: null,
     emailVerified,
     email: email ?? null,
     phoneNumber: phoneNumber ?? null,
