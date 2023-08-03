@@ -148,6 +148,7 @@ export const onVendorOnboardingCallable = onCall(
       stripeSubscriptionId: stripeSub.id,
       branches: [],
       apiKeys: [],
+      branchCreatedAt: FieldValue.serverTimestamp(),
     };
 
     const updatedUserData = {

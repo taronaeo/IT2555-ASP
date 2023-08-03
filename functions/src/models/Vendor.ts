@@ -1,3 +1,5 @@
+import type { FieldValue } from './Metadata';
+
 export interface Vendor {
   readonly vendorId: string;
   readonly vendorUen: string;
@@ -13,6 +15,7 @@ export interface Vendor {
 
   branches: VendorBranch[] | null;
   apiKeys: VendorApiKey[] | null;
+  branchCreatedAt: FieldValue;
 }
 
 export interface VendorBranch {
