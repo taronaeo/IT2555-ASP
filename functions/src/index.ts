@@ -10,4 +10,5 @@ setGlobalOptions({
 
 export * from './http/onHttpReceiptSubmit';
 export * from './handlers/onBeforeUserCreated';
+export * from './callables/onReceiptViewCallable';
 // export * from './callables/onOnboardingCallable';
