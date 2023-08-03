@@ -1,6 +1,7 @@
 import type { Metadata } from './Metadata';
 
 export interface Receipt extends Pick<Metadata, 'createdAt'> {
+  userUid: string | null;
   readonly receiptId: string;
   readonly vendor: {
     vendorId: string;

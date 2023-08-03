@@ -15,5 +15,6 @@ export * from './handlers/onBeforeUserCreated';
 export * from './events/onReceiptCreatedEvent';
 
 // HTTP Functions
+export * from './http/onHttpReceiptSubmit';
 export * from './callables/onVendorOnboardingCallable';
-// export * from './callables/onOnboardingCallable';
+export * from './callables/onReceiptViewCallable';

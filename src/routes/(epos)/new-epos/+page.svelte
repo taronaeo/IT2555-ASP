@@ -1,15 +1,12 @@
 <script lang="ts">
-    import { or } from "firebase/firestore";
-    import { stringify } from "postcss";
+    import { functions } from '$lib/firebase';
+    import { httpsCallable } from 'firebase/functions';
 
     import { goto } from '$app/navigation';
     import { authStore } from '$lib/stores';
 
 
     import type { ReceiptItem } from "$lib/models/item";
-    import type { Receipt } from "$lib/models/receipt";
-
-    import { FieldValue, serverTimestamp } from "firebase/firestore";
 
     let userUid:string = ''
 
@@ -39,17 +36,19 @@
     
     let total_float:number = 0;
     let total_str:string = "";
+    
+    let imgSrcBase64 ="";
 
     const vendor_info: {vendorId: string; vendorName: string;} = {
-        vendorId: "FairPriceNTUC",
+        vendorId: "6NzEgyX2iDfMqUfqF2dx",
         vendorName: "NTUC Fairprice",
     }
     const branch_info: {branchId: string; branchLocation: string; branchPostal: number; key: string; secret: string;}={
-        branchId: 'MandarinGallery',
+        branchId: 'AuriFactory',
         branchLocation: '33A Orchard Road, #03-13, Mandarin Gallery',
         branchPostal: 123123,
-        key: 'spiderman',
-        secret: 'kurasaki'
+        key: 'atcO7#sOpn+SzV*W',
+        secret: 'hUwcPn$1uf17s4|k'
 
     }
 
@@ -84,9 +83,9 @@
         {"itemName": "Coleslaw","price":6.00}
 ]
 
-    $:{
+    $:{ subtotal_float = 0;
         ordered_items.forEach(item=>{
-            console.log(ordered_items)
+            
             quantity_of_item+=1
             let item_name: string = item["item"]
             let item_price: number = 0;
@@ -97,11 +96,12 @@
             })
             
             quantity_of_item = item["quantity"]
+            console.log(item_price)
             subtotal_float += (item_price * quantity_of_item)
             subtotal_float = Math.round(subtotal_float * 100) / 100
-            gst_float = subtotal_float*0.08
-            gst_float = Math.round(gst_float * 100) / 100
-            total_float = Math.round((gst_float + subtotal_float)*100/100)
+            gst_float = subtotal_float*100*0.08
+            gst_float = (gst_float / 100)
+            total_float = gst_float + subtotal_float
 
         })
         subtotal_str = '$' + subtotal_float.toFixed(2)
@@ -109,7 +109,13 @@
         total_str = '$' + total_float.toFixed(2)
     }
 
+    async function generateQR(receiptId:string){
+        const imgSrc = await fetch(`/api/qr-generation?receiptId=${receiptId}`,{
+            method: "GET",
+        });
+        imgSrcBase64 = await imgSrc.text();
 
+    }
 
     async function callAPI(){
         
@@ -156,25 +162,26 @@
             paymentMethod: payment_method,
             change: 0,
             
-        }
-
-        const response = await fetch('api/epos-upload',{
+        }   
+        
+        await fetch('https://onhttpreceiptsubmit-zuffjtk3wq-as.a.run.app',{
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "api_key": key,
-                "api_secret": secret
+                "API-Key": key,
+                "API-Secret": secret,
             },
             body: JSON.stringify(receipt)
-        })
+        }).then(res => res.json())
+          .then(data =>{
+            generateQR(data.message)
+          })
         
-        const data = await response.json()
-        console.log(data)
 
         
         
     }
-
+    let paymentSuccess = false;
 
 
 
@@ -214,11 +221,22 @@ ePOS v34.2.3
 
     </div>
 </div>
-<div class:hidden={!    paynow} class="fixed inset-0 w-full bg-black/50">
-    <div class="text-center font-bold absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-zinc-300 py-12 px-32 border-2 border-t-black border-l-black border-b-white border-r-white text-xl">
+<div class:hidden={!paynow} class="fixed flex justify-center items-center inset-0 w-full bg-black/50">
+    <div class:hidden={paymentSuccess} class="text-center font-bold bg-zinc-300 py-12 px-32 border-2 border-t-black border-l-black border-b-white border-r-white text-xl">
         Scan QR Code for payment
         <div>
-        <img on:click={callAPI} src="example-qr.jpeg" class="mt-4">
+        <img on:click={()=>{paymentSuccess=true;}} on:click={callAPI}  src="example-qr.png" class="mt-4 text-center h-72"> <!--on:click={callAPI}-->
+        </div>
+        <button on:click = {()=>{paynow=false}} class=" w-32 mt-2 flex justify-center m-auto font-bold border-b-2 border-2 border-zinc-600 border-l-white border-t-white bg-red-700 rounded px-8 py-3 text-2xl text-zinc-100">
+            Cancel
+        </button>
+    </div>
+    <div class:hidden={!paymentSuccess} class="text-center font-bold w-4/5 bg-zinc-300 py-12 px-32 border-2 border-t-black border-l-black border-b-white border-r-white text-xl">
+        
+        <div class="font-bold">
+            Payment Successful! Scan QR Code for Dr Receipts
+            <img class="inline text-center h-72 my-6" src="data:image/png;base64, {imgSrcBase64}"><br>
+            You have 1 minute to scan the QR code before it becomes invalid.
         </div>
         <button on:click = {()=>{paynow=false}} class=" w-32 mt-2 flex justify-center m-auto font-bold border-b-2 border-2 border-zinc-600 border-l-white border-t-white bg-red-700 rounded px-8 py-3 text-2xl text-zinc-100">
             Cancel
