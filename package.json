@@ -15,6 +15,7 @@
 	},
 	"dependencies": {
 		"@fontsource/dm-sans": "^5.0.3",
+		"dayjs": "^1.11.9",
 		"firebase": "^9.22.1",
 		"libphonenumber-js": "^1.10.38",
 		"qr-image": "^3.2.0",
