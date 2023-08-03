@@ -15,6 +15,7 @@
 	},
 	"dependencies": {
 		"@fontsource/dm-sans": "^5.0.3",
+		"dayjs": "^1.11.9",
 		"firebase": "^9.22.1",
 		"libphonenumber-js": "^1.10.38",
 		"qr-image": "^3.2.0",
@@ -28,6 +29,7 @@
 		"@tailwindcss/aspect-ratio": "^0.4.2",
 		"@tailwindcss/forms": "^0.5.3",
 		"@types/cookie": "^0.5.1",
+		"@types/nodemailer": "^6.4.9",
 		"@types/qr-image": "^3.2.5",
 		"@typescript-eslint/eslint-plugin": "^5.45.0",
 		"@typescript-eslint/parser": "^5.45.0",
