@@ -26,12 +26,6 @@
       "**/.*",
       "**/node_modules/**"
     ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
-    ],
     "frameworksBackend": {
       "region": "asia-east1",
       "maxInstances": 1
