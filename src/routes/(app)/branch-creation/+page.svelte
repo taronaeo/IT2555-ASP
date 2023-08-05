@@ -4,6 +4,7 @@
   import { goto } from '$app/navigation';
   import { authStore } from '$lib/stores';
   import { AniIconLoading } from '$lib/icons';
+  import { z } from 'zod';
 
   import crypto from 'crypto';
   let userUid:string = ""
@@ -180,34 +181,38 @@ function next_page(){
   let inputCreationId:string = "";
 
   let inputCreationLocation:string = "";
-  let inputCreationPostal: number | undefined;
+  let inputCreationPostal: number | undefined = ""
   let invalid: boolean = false;
   let alert: string = "";
+
+  const branchSchema = z.object({
+    id: z
+      .string()
+      .min(2, 'ID must be at least 2 characters')
+      .max(25, 'ID cannot exceed 15 characters')
+      .refine(id => !id.includes(' '), 'ID cannot contain a space'),
+    location: z.string().min(2, 'Location must be at least 2 characters'),
+    postalCode: z.union([z.number(), z.string()]).refine(code => {
+    const parsedCode = Number(code);
+    return !isNaN(parsedCode) && parsedCode >= 100000 && parsedCode <= 999999;
+  }, {
+    message: 'Invalid postal code. Only valid 6-digit SG postal code allowed',
+  }),
+  });
   async function createBranch(){
-    if(inputCreationId.length === 0){
+    const inputBranches = branchSchema.safeParse({
+      id: inputCreationId,
+      location: inputCreationLocation,
+      postalCode: inputCreationPostal
+    });
+    if(inputCreationId.length === 0 || inputCreationLocation.length === 0){
       invalid = true;
-      alert = "Fill in all fields!"
+      alert = "Fill in all fields"
       return
     }
-    if(hasWhiteSpace(inputCreationId)){
+    if (!inputBranches.success) {
       invalid = true;
-      alert = "Branch ID cannot have spaces";
-      return
-    }
-    if(inputCreationId.length > 15){
-      invalid = true;
-      alert = "ID cannot be more than 15 characters long";
-      return
-    }
-    if(isNaN(Number(inputCreationPostal))){
-      invalid = true;
-      alert = "Postal Code must be number";
-      return
-    }
-    inputCreationPostal = Number(inputCreationPostal);
-    if(100000 > inputCreationPostal || inputCreationPostal > 999999){
-      invalid = true;
-      alert = "Input valid Singaporean 6-digit postal code";
+      alert = inputBranches.error.issues[0].message;
       return
     }
     const vendorId = await get_vendor_id();
@@ -242,7 +247,7 @@ function next_page(){
       alert = "Branch already exists!"
       return
     }
-
+    
   }
 
   async function genApiKey(branchId: string){

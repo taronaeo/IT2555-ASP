@@ -106,14 +106,14 @@
     }
 
     async function generateQR(receiptId:string){
-        timeout=false
+        qrExpired=false
         const imgSrc = await fetch(`/api/qr-generation?receiptId=${receiptId}`,{
             method: "GET",
         });
         imgSrcBase64 = await imgSrc.text();
         setTimeout(() => {
-            timeout = true;
-        }, 3000)
+            qrExpired = true;
+        }, 60000)
 
     }
 
@@ -172,16 +172,17 @@
             },
             body: JSON.stringify(receipt)
         }).then(res => {
-            if (res.status === 200){
-                return res.json();
-            }
-            return res.json().then(err=> {console.error(`Error ${err.status}, Message: ${err.message}`); throw error(err.status, err.message)})
+            return res.json();
         })
           .then(data =>{
-            generateQR(data.message)
-            generatedReceipt = data.message
+            if(data.status != 200){
+                throw Error(`API Endpoint returned ${data.status}, with ${data.message}`)
+            }   
+            generateQR(data.message);
+            generatedReceipt = data.message;
           }).catch(err => {
             validQR = false;
+            console.error(err);
           })
     }
     let paymentSuccess = false;
@@ -215,7 +216,7 @@
         
     }
 
-    let timeout = false;
+    let qrExpired = false;
     
     function regenQR(receiptId){
         generateQR(receiptId)
@@ -268,7 +269,7 @@ ePOS v34.2.3
         </button>
     </div>
     <div class:hidden={!paymentSuccess} class="text-center font-bold w-4/5 bg-zinc-300 py-12 px-32 border-2 border-t-black border-l-black border-b-white border-r-white text-xl">
-        {#if validQR && !timeout}
+        {#if validQR && !qrExpired}
         <div class="font-bold">
             Payment Successful! Scan QR Code for Dr Receipts
             <img class="inline text-center h-72 my-6" src="data:image/png;base64, {imgSrcBase64}"><br>
@@ -278,7 +279,7 @@ ePOS v34.2.3
             <div class="font-bold">ERROR OCCURRED</div>
             <div class="font-bold">RECEIPT COULD NOT BE GENERATED</div>
         {/if}
-        {#if timeout}
+        {#if qrExpired}
         <div class="font-bold m-auto flex justify-center">Time to scan ran out, request staff for assistance</div>
         <div class="block text-center">
             <button on:click = {()=>{regenQR(generatedReceipt)}} class=" w-48 mt-2 mr-1 m-auto font-bold border-b-2 border-2 border-zinc-600 border-l-white border-t-white bg-blue-600 rounded px-8 py-3 text-2xl text-zinc-100">
@@ -304,7 +305,7 @@ ePOS v34.2.3
         </div>
     </div>
     <div class:hidden={!cashPaymentSuccess} class="text-center font-bold w-4/5 bg-zinc-300 py-12 px-32 border-2 border-t-black border-l-black border-b-white border-r-white text-xl">
-        {#if validQR && !timeout}
+        {#if validQR && !qrExpired}
         <div class="font-bold">
             Payment Successful! Scan QR Code for Dr Receipts
             <img class="inline text-center h-72 my-6" src="data:image/png;base64, {imgSrcBase64}"><br>
@@ -314,7 +315,7 @@ ePOS v34.2.3
             <div class="font-bold">ERROR OCCURRED</div>
             <div class="font-bold">RECEIPT COULD NOT BE GENERATED</div>
         {/if}  
-        {#if timeout}
+        {#if qrExpired}
         <div class="font-bold m-auto flex justify-center">Time to scan ran out, request staff for assistance</div>
         <div class="block text-center">
             <button on:click = {()=>{regenQR(generatedReceipt)}} class=" w-48 mt-2 mr-1 m-auto font-bold border-b-2 border-2 border-zinc-600 border-l-white border-t-white bg-blue-600 rounded px-8 py-3 text-2xl text-zinc-100">
@@ -329,7 +330,7 @@ ePOS v34.2.3
 
 <div class:hidden={!creditPaymentSuccess} class="fixed flex justify-center items-center inset-0 w-full bg-black/50">
     <div  class="text-center font-bold w-4/5 bg-zinc-300 py-12 px-32 border-2 border-t-black border-l-black border-b-white border-r-white text-xl">
-        {#if validQR && !timeout}
+        {#if validQR && !qrExpired}
         <div class="font-bold">
             Payment Successful! Scan QR Code for Dr Receipts
             <img class="inline text-center h-72 my-6" src="data:image/png;base64, {imgSrcBase64}"><br>
@@ -339,7 +340,7 @@ ePOS v34.2.3
             <div class="font-bold">ERROR OCCURRED</div>
             <div class="font-bold">RECEIPT COULD NOT BE GENERATED</div>
         {/if}  
-        {#if timeout}
+        {#if qrExpired}
         <div class="font-bold m-auto flex justify-center">Time to scan ran out, request staff for assistance</div>
         <div class="block text-center">
             <button on:click = {()=>{regenQR(generatedReceipt)}} class=" w-48 mt-2 mr-1 m-auto font-bold border-b-2 border-2 border-zinc-600 border-l-white border-t-white bg-blue-600 rounded px-8 py-3 text-2xl text-zinc-100">
