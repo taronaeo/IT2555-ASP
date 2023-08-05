@@ -33,7 +33,7 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
         req.rawHeaders
       );
 
-      res.status(400).json({
+      return res.status(400).json({
         status: 400,
         message: 'Missing headers \'API-Key\' and \'API-Secret\'',
       });
@@ -58,7 +58,7 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
         req.rawHeaders
       );
 
-      res.status(400).json({
+      return res.status(400).json({
         status: 400,
         message: 'Missing body \'branchId\', \'vendorId\'',
       });
@@ -75,7 +75,7 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
 
     const querySnapshot = await query.get();
     if (querySnapshot.docs.length === 0) {
-      res
+      return res
         .status(400)
         .json({ status: 400, message: 'Invalid API-Key or API-Secret' });
     }
@@ -112,10 +112,12 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
 
     try {
       await receiptDoc.set(receiptData, { merge: true });
-      res.status(200).json({ status: 200, message: receiptDoc.id });
+      return res.status(200).json({ status: 200, message: receiptDoc.id });
     } catch (error) {
       logger.error(error);
-      res.status(500).json({ status: 500, message: 'Internal server error ' });
+      return res.status(500).json(
+        { status: 500, message: 'Internal server error ' }
+      );
     }
   });
 });

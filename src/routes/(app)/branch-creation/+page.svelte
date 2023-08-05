@@ -189,17 +189,22 @@ function next_page(){
       alert = "Fill in all fields!"
       return
     }
-    if(inputBranchId.length > 15){
+    if(hasWhiteSpace(inputCreationId)){
+      invalid = true;
+      alert = "Branch ID cannot have spaces";
+      return
+    }
+    if(inputCreationId.length > 15){
       invalid = true;
       alert = "ID cannot be more than 15 characters long";
       return
     }
-    if(isNaN(parseInt(inputCreationPostal))){
+    if(isNaN(Number(inputCreationPostal))){
       invalid = true;
       alert = "Postal Code must be number";
       return
     }
-    inputCreationPostal = parseInt(inputCreationPostal);
+    inputCreationPostal = Number(inputCreationPostal);
     if(100000 > inputCreationPostal || inputCreationPostal > 999999){
       invalid = true;
       alert = "Input valid Singaporean 6-digit postal code";
@@ -295,6 +300,10 @@ function next_page(){
         return;
       }
     })
+  }
+  
+  function hasWhiteSpace(branchId) {
+    return /\s/g.test(branchId);
   }
 
 
