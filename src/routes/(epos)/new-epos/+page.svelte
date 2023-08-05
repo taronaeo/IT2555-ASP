@@ -8,14 +8,10 @@
 
     import type { ReceiptItem } from "$lib/models/item";
 
-    let userUid:string = ''
 
-    if(!$authStore){
+    $:{if($authStore === null){
         goto('/')
-    }
-    else{
-        userUid = $authStore.uid
-    }
+    }}
     
     let editing:boolean = false;
     let selected:boolean = false;
@@ -146,8 +142,7 @@
         })
 
         
-        let receipt: {userUid: string;vendor: {vendorId: string; vendorName: string;}; branchLocation: string; branchId: string; branchPostal: number; items:ReceiptItem[]; subtotal: number; gst: number; total: number; paymentMethod: string; change: number} = {
-            userUid: userUid,
+        let receipt: {vendor: {vendorId: string; vendorName: string;}; branchLocation: string; branchId: string; branchPostal: number; items:ReceiptItem[]; subtotal: number; gst: number; total: number; paymentMethod: string; change: number} = {
             vendor: {
                 vendorId: vendor_info['vendorId'],
                 vendorName: vendor_info['vendorName']

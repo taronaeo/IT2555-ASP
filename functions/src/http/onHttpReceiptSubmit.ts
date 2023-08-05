@@ -2,7 +2,7 @@ import * as logger from 'firebase-functions/logger';
 
 import { firestore } from '../firebase';
 import { onRequest } from 'firebase-functions/v2/https';
-import { FieldValue } from '../models';
+import { FieldValue, Receipt } from '../models';
 
 export const onHttpReceiptSubmit = onRequest(async (req, res) => {
   const cors = (await import('cors'))({ origin: true });
@@ -40,31 +40,27 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
     }
 
     const data = req.body;
-    const userId = data.userUid;
     const branchId = data.branchId;
     const vendorId = data.vendor['vendorId'];
 
     if (
-      !userId ||
       !branchId ||
       !vendorId ||
-      typeof userId !== 'string' ||
       typeof branchId !== 'string' ||
       typeof vendorId !== 'string' ||
-      userId.length === 0 ||
       branchId.length === 0 ||
       vendorId.length === 0
     ) {
       logger.error(
         'onHttpReceiptSubmit:HttpsError',
         'invalid-argument',
-        'Missing body \'userUid\', \'branchId\', \'vendorId\'',
+        'Missing body \'branchId\', \'vendorId\'',
         req.rawHeaders
       );
 
       res.status(400).json({
         status: 400,
-        message: 'Missing body \'userUid\', \'branchId\', \'vendorId\'',
+        message: 'Missing body \'branchId\', \'vendorId\'',
       });
     }
 
@@ -97,7 +93,7 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
 
     const receiptDoc = receiptsRef.doc();
     const receiptData = {
-      userUid: userId,
+      userUid: null,
       receiptId: receiptDoc.id,
       vendor: {
         vendorId,
@@ -112,7 +108,7 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
       change,
       paymentMethod,
       createdAt: FieldValue.serverTimestamp(),
-    };
+    } satisfies Receipt;
 
     try {
       await receiptDoc.set(receiptData, { merge: true });
