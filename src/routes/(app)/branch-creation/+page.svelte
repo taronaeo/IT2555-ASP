@@ -236,7 +236,7 @@ function next_page(){
     let newBranch = {
       branchId: inputCreationId,
       branchLocation: inputCreationLocation,
-      branchPostal: inputCreationPostal
+      branchPostal: Number(inputCreationPostal)
     }
     
     const q = query(vendorCol,
