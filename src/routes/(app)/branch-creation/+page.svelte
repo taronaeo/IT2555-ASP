@@ -6,16 +6,18 @@
   import { AniIconLoading } from '$lib/icons';
   import { z } from 'zod';
 
-  import crypto from 'crypto';
+  
   let userUid:string = ""
-
+  
   if(!$authStore){
         goto('/')
     }
   else{
       userUid = $authStore.uid
   }
-
+  if(!$authStore?.isOnboarded){
+    goto('/onboarding')
+  }
   
 
   let branches = [];
@@ -181,7 +183,7 @@ function next_page(){
   let inputCreationId:string = "";
 
   let inputCreationLocation:string = "";
-  let inputCreationPostal: number | undefined = ""
+  let inputCreationPostal: string = "";
   let invalid: boolean = false;
   let alert: string = "";
 
@@ -192,12 +194,23 @@ function next_page(){
       .max(25, 'ID cannot exceed 15 characters')
       .refine(id => !id.includes(' '), 'ID cannot contain a space'),
     location: z.string().min(2, 'Location must be at least 2 characters'),
-    postalCode: z.union([z.number(), z.string()]).refine(code => {
-    const parsedCode = Number(code);
-    return !isNaN(parsedCode) && parsedCode >= 100000 && parsedCode <= 999999;
-  }, {
-    message: 'Invalid postal code. Only valid 6-digit SG postal code allowed',
-  }),
+    postalCode: z
+      .string({ required_error: 'Postal code is required' })
+      .min(6, 'Invalid postal code. Only valid 6-digital SG postal code is allowed.')
+      .max(6, 'Invalid postal code. Only valid 6-digital SG postal code is allowed.')
+      .refine(
+        (postalCode) => {
+          const parsedPostalCode = Number(postalCode);
+          if (isNaN(parsedPostalCode)) return false;
+          if (parsedPostalCode <= 100000) return false;
+          if (parsedPostalCode >= 999999) return false;
+          return true;
+        },
+        {
+          message:
+            'Invalid postal code. Only valid 6-digital SG postal code is allowed.',
+        }
+      ),
   });
   async function createBranch(){
     const inputBranches = branchSchema.safeParse({
