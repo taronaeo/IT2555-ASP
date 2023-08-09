@@ -1,14 +1,13 @@
 <script>
     import { firestore } from '$lib/firebase'
     import { goto } from '$app/navigation'
-    import { getDoc, doc, serverTimestamp, updateDoc } from 'firebase/firestore'
+    import { doc, updateDoc } from 'firebase/firestore'
     import { page } from '$app/stores';
     import { authStore } from '$lib/stores';
     import { getStorage, ref, getDownloadURL } from "firebase/storage";
     import { AniIconLoading } from '$lib/icons';
-    import { httpsCallable } from 'firebase/functions';
-    import { functions } from '$lib/firebase';
     import dayjs from 'dayjs';
+    import { getHttpsCallable } from '$lib/firebase/functions'
 
     $:if ($authStore === null){
         goto('/account/signin')
@@ -25,10 +24,7 @@
     async function docSnap(){
             
 
-            const onReceiptViewCallable = httpsCallable(
-                functions,
-                'onReceiptViewCallable'
-            );
+            const onReceiptViewCallable = getHttpsCallable('onReceiptViewCallable');
             const receiptData = await onReceiptViewCallable(current_receipt_id).catch(
                 (err) => {
                     console.log(err);

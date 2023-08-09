@@ -115,9 +115,9 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
       return res.status(200).json({ status: 200, message: receiptDoc.id });
     } catch (error) {
       logger.error(error);
-      return res.status(500).json(
-        { status: 500, message: 'Internal server error ' }
-      );
+      return res
+        .status(500)
+        .json({ status: 500, message: 'Internal server error' });
     }
   });
 });

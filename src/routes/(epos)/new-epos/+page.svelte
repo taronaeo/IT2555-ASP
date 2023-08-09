@@ -1,12 +1,8 @@
 <!--PAGE IS TO BE DISPLAYED IN 1180 x 820 RESOLUTION-->
 
 <script lang="ts">
-    import { functions } from '$lib/firebase';
-    import { httpsCallable } from 'firebase/functions';
-
     import { goto } from '$app/navigation';
     import { authStore } from '$lib/stores';
-    import { error } from '@sveltejs/kit';
 
     $:{if($authStore === null){
         goto('/')
