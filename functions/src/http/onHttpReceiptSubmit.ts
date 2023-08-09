@@ -1,5 +1,6 @@
 import * as logger from 'firebase-functions/logger';
 
+import { webcrypto } from 'crypto';
 import { firestore } from '../firebase';
 import { onRequest } from 'firebase-functions/v2/https';
 import { FieldValue, Receipt } from '../models';
@@ -17,6 +18,9 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
 
     const apiKey = req.get('API-Key');
     const apiSecret = req.get('API-Secret');
+    const nonce = req.get('Nonce');
+    const hmacHexHeader = req.get('HMAC');
+    const subtle = webcrypto.subtle;
 
     if (
       !apiKey ||
@@ -39,9 +43,66 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
       });
     }
 
+    if (
+      !hmacHexHeader ||
+      !nonce ||
+      typeof hmacHexHeader !== 'string' ||
+      typeof nonce !== 'string' ||
+      hmacHexHeader.length === 0 ||
+      nonce.length === 0
+    ) {
+      logger.error(
+        'onHttpReceiptSubmit:HttpsError',
+        'invalid-argument',
+        'Missing headers \'Nonce\' and \'HMAC\'',
+        req.rawHeaders
+      );
+
+      return res.status(400).json({
+        status: 400,
+        message: 'Missing headers \'Nonce\' and \'HMAC\'',
+      });
+    }
+    const encoder = new TextEncoder();
+    const encodedApiSecret = encoder.encode(apiSecret);
+    const hmacKey = await subtle.importKey(
+      'raw',
+      encodedApiSecret,
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['verify'],
+    );
+    const encodedNonce = encoder.encode(nonce);
+    const signatureIntArray = Uint8Array.from(
+      Buffer.from(
+        hmacHexHeader,
+        'hex'
+      )
+    );
+    const validHmac = await subtle.verify(
+      'HMAC',
+      hmacKey,
+      signatureIntArray,
+      encodedNonce
+    );
+
+    if (!validHmac) {
+      logger.error(
+        'onHttpReceiptSubmit:HttpsError',
+        'invalid-argument',
+        'Cannot be trusted, invalid HMAC calculated',
+      );
+
+      return res.status(400).json({
+        status: 400,
+        message: 'Cannot be trusted, invalid HMAC calculated',
+      });
+    }
+
     const data = req.body;
     const branchId = data.branchId;
     const vendorId = data.vendor['vendorId'];
+
 
     if (
       !branchId ||
@@ -115,9 +176,9 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
       return res.status(200).json({ status: 200, message: receiptDoc.id });
     } catch (error) {
       logger.error(error);
-      return res.status(500).json(
-        { status: 500, message: 'Internal server error ' }
-      );
+      return res
+        .status(500)
+        .json({ status: 500, message: 'Internal server error ' });
     }
   });
 });

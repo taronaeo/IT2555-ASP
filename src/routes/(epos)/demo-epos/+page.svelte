@@ -6,7 +6,6 @@
 
     import { goto } from '$app/navigation';
     import { authStore } from '$lib/stores';
-    import { error } from '@sveltejs/kit';
 
     $:{if($authStore === null){
         goto('/')
@@ -117,6 +116,28 @@
 
     }
 
+    async function createHmac(nonce: string, apiSecret: string) {
+        let encoder = new TextEncoder();
+        let encodedApiSecret = encoder.encode(apiSecret);
+
+        let key = await window.crypto.subtle.importKey(
+            "raw",
+            encodedApiSecret,
+            { name: "HMAC", hash: "SHA-256" },
+            false,
+            ["sign"]
+        );
+        let encodedNonce = encoder.encode(nonce);
+
+        let signature = await window.crypto.subtle.sign("HMAC", key, encodedNonce);
+
+        let signatureArray = new Uint8Array(signature);
+        let signatureHex = Array.from(signatureArray)
+            .map(byte => byte.toString(16).padStart(2, "0"))
+            .join("");
+        return signatureHex;
+    }
+
     async function callAPI(){
         
         const branchId: string = branch_info['branchId']
@@ -124,6 +145,13 @@
         const branchPostal: number = branch_info['branchPostal']
         const key: string = branch_info['key']
         const secret: string = branch_info['secret']
+
+        let byteArray = new Uint32Array(4);
+        window.crypto.getRandomValues(byteArray);
+        let nonce = Array.from(byteArray).map(n=>n.toString(16)).join('');
+
+        const hmacHex = await createHmac(nonce,secret)
+
 
         let final_items = []
         ordered_items.forEach(item =>{
@@ -169,6 +197,8 @@
                 "Content-Type": "application/json",
                 "API-Key": key,
                 "API-Secret": secret,
+                "Nonce": nonce,
+                "HMAC": hmacHex,
             },
             body: JSON.stringify(receipt)
         }).then(res => {
