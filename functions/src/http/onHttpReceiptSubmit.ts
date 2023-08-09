@@ -10,7 +10,10 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
 
   cors(req, res, async () => {
     if (req.method !== 'POST') {
-      res.status(405).json({ status: 405, message: 'Method not allowed' });
+      return res.status(405).json(
+        { status: 405,
+          message: 'Method not allowed',
+        });
     }
 
     const vendorsRef = firestore.collection('vendors');
