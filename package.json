@@ -4,8 +4,9 @@
 	"version": "0.0.1",
 	"license": "MIT",
 	"scripts": {
-		"dev": "npm-run-all -p dev:firebase dev:functions",
-		"dev:firebase": "firebase emulators:start",
+		"dev": "npm-run-all -p dev:web dev:firebase dev:functions",
+		"dev:web": "vite dev",
+		"dev:firebase": "firebase emulators:start --only auth,functions,firestore,pubsub,storage,eventarc",
 		"dev:functions": "yarn --cwd functions build:watch",
 		"build": "vite build",
 		"preview": "vite preview",
