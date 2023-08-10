@@ -12,8 +12,14 @@ const endpoints = {
   onHttpReceiptSubmit: '',
 };
 
-export const getHttpsCallable = (endpoint: keyof typeof callables) =>
-  httpsCallable(functions, endpoint, { timeout: 60000 });
+export const getHttpsCallable = (
+  endpoint: keyof typeof callables,
+  preventReplayAttack = true
+) =>
+  httpsCallable(functions, endpoint, {
+    timeout: 60000,
+    limitedUseAppCheckTokens: preventReplayAttack,
+  });
 
 export const getHttpsEndpoint = (
   endpoint: keyof typeof endpoints,
