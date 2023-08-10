@@ -18,6 +18,10 @@ type VendorOnboarding = Pick<
 };
 
 export const onVendorOnboardingCallable = onCall(
+  {
+    enforceAppCheck: true,
+    consumeAppCheckToken: true,
+  },
   async ({ auth, data, rawRequest }) => {
     if (!auth) {
       logger.error(

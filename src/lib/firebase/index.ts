@@ -1,8 +1,9 @@
-import { dev } from '$app/environment';
+import { dev, browser } from '$app/environment';
 import { getAuth, connectAuthEmulator } from 'firebase/auth';
 import { getStorage, connectStorageEmulator } from 'firebase/storage';
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 import { getFunctions, connectFunctionsEmulator } from 'firebase/functions';
+import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 
 import { getApp, getApps, initializeApp } from 'firebase/app';
 
@@ -17,6 +18,15 @@ const firebaseConfig = {
 };
 
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+
+if (browser && dev) self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+if (browser)
+  initializeAppCheck(app, {
+    provider: new ReCaptchaV3Provider(
+      '6Lcz2pUnAAAAABbkaM4GScWYTVy_W3Wy-t6YbJ12'
+    ),
+    isTokenAutoRefreshEnabled: true,
+  });
 
 export const auth = getAuth(app);
 export const storage = getStorage(app);
