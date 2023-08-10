@@ -6,6 +6,7 @@ setGlobalOptions({
   concurrency: 1000,
   region: 'asia-southeast1',
   maxInstances: 1,
+  secrets: ['STRIPE_SECRET'],
 });
 
 // Auth Blocking Functions

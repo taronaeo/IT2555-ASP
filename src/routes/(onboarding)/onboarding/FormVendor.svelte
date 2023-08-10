@@ -1,45 +1,15 @@
 <script lang="ts">
-  import { Alert } from '$lib/components';
-  import { createForm } from 'svelte-forms-lib';
-
-  import { FormInput } from '$lib/components';
-
-  import { validateZod } from '$lib/forms';
-  import { functions } from '$lib/firebase';
-  import { httpsCallable } from 'firebase/functions';
-  import { state, schema } from './FormVendor';
-
-  const {
+  import { AniIconLoading } from '$lib/icons';
+  import { Alert, FormInput } from '$lib/components';
+  import {
+    state,
     form,
     errors,
     isValidating,
     isSubmitting,
     handleChange,
     handleSubmit,
-  } = createForm({
-    initialValues: {
-      vendorUen: '',
-      vendorName: '',
-      vendorCategory: '',
-      vendorPhoneNumber: '',
-      cardNumber: '',
-      cardExpMonth: '',
-      cardExpYear: '',
-      cardCvc: '',
-    },
-    validate: (data) => validateZod(schema, data),
-    onSubmit: (data) => {
-      const transformed = schema.parse(data);
-      const onboardVendor = httpsCallable(
-        functions,
-        'onVendorOnboardingCallable'
-      );
-
-      return onboardVendor(transformed).catch(
-        (err) => ($state.errorMessage = err)
-      );
-    },
-  });
+  } from './FormVendor';
 </script>
 
 <div
@@ -170,12 +140,17 @@
     <div class="flex flex-row justify-end">
       <button
         type="submit"
+        disabled={$state.isLoading || $isValidating || $isSubmitting}
         class="px-6 py-2 rounded
               text-sm text-white text-center font-medium
               bg-emerald-600 hover:bg-emerald-700
               focus:outline-none focus:ring-4 focus:ring-green-300
               disabled:opacity-75 disabled:cursor-not-allowed">
-        Finish
+        {#if !($state.isLoading || $isValidating || $isSubmitting)}
+          Finish
+        {:else}
+          <AniIconLoading class="w-6 h-6 mx-auto" fill="#fff" />
+        {/if}
       </button>
     </div>
   </form>
