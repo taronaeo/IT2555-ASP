@@ -3,6 +3,7 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import { authStore } from '$lib/stores';
+    import { getHttpsEndpoint } from '$lib/firebase/functions';
 
     $:{if($authStore === null){
         goto('/')
@@ -159,7 +160,8 @@
             
         }   
         
-        await fetch('https://onhttpreceiptsubmit-zuffjtk3wq-as.a.run.app',{
+        const endpoint = getHttpsEndpoint('onHttpReceiptSubmit');
+        await fetch(endpoint,{
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
