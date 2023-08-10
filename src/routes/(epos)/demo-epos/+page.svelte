@@ -4,6 +4,8 @@
     import { goto } from '$app/navigation';
     import { authStore } from '$lib/stores';
     import { getHttpsEndpoint } from '$lib/firebase/functions';
+    import type { FieldValue } from 'firebase/firestore';
+    import { serverTimestamp } from 'firebase/firestore';
 
     $:{if($authStore === null){
         goto('/')
@@ -33,19 +35,13 @@
 
     let generatedReceipt = ""
 
-    const vendor_info: {vendorId: string; vendorName: string;} = {
-        vendorId: "6NzEgyX2iDfMqUfqF2dx",
-        vendorName: "NTUC Fairprice",
-    }
-    const branch_info: {branchId: string; branchLocation: string; branchPostal: number; key: string; secret: string;}={
-        branchId: 'AuriFactory',
-        branchLocation: '33A Orchard Road, #03-13, Mandarin Gallery',
-        branchPostal: 123123,
-        key: 'atcO7#sOpn+SzV*W',
-        secret: 'hUwcPn$1uf17s4|k'
+    const branch_info: {branchId: string; vendorId: string; key: string; secret: string;}={
+        branchId: 'WaterwayPoint',
+        vendorId: '5qx2yI0Db3sGkSFUp6Yr',
+        key: 'k?DfkTVZDqRXUWtL',
+        secret: 'VhQ4rLv|koRf4XjD'
 
     }
-
 
     const food: {itemName: string; price: number}[] = [
         {"itemName": "Aglio Olio", "price": 16.50},
@@ -114,7 +110,7 @@
 
     }
 
-    async function createHmac(nonce: string, apiSecret: string) {
+    async function createHmac(receipt: string, apiSecret: string) {
         let encoder = new TextEncoder();
         let encodedApiSecret = encoder.encode(apiSecret);
 
@@ -125,9 +121,8 @@
             false,
             ["sign"]
         );
-        let encodedNonce = encoder.encode(nonce);
-
-        let signature = await window.crypto.subtle.sign("HMAC", key, encodedNonce);
+        let encodedReceipt = encoder.encode(receipt);
+        let signature = await window.crypto.subtle.sign("HMAC", key, encodedReceipt);
 
         let signatureArray = new Uint8Array(signature);
         let signatureHex = Array.from(signatureArray)
@@ -139,17 +134,13 @@
     async function callAPI(){
         
         const branchId: string = branch_info['branchId']
-        const branchLocation: string = branch_info['branchLocation']
-        const branchPostal: number = branch_info['branchPostal']
+        const vendorId: string = branch_info['vendorId']
         const key: string = branch_info['key']
         const secret: string = branch_info['secret']
+        
 
-        let byteArray = new Uint32Array(4);
-        window.crypto.getRandomValues(byteArray);
-        let nonce = Array.from(byteArray).map(n=>n.toString(16)).join('');
-
-        const hmacHex = await createHmac(nonce,secret)
-
+        const currentDate = new Date();
+        const nonce: string = `${currentDate.getTime()}`;
 
         let final_items = []
         ordered_items.forEach(item =>{
@@ -161,9 +152,9 @@
                 }
             })
 
-          let receipt_item:{itemName: string; price: number} = {
+          let receipt_item:{itemName: string; price: string} = {
             'itemName': item['item'],
-            'price': item_price
+            'price': item_price.toFixed(2)
           }
           for(let i = 0; i < item['quantity'];i++){
            final_items.push(receipt_item)
@@ -172,22 +163,19 @@
         })
 
         
-        let receipt: {vendor: {vendorId: string; vendorName: string;}; branchLocation: string; branchId: string; branchPostal: number; items:ReceiptItem[]; subtotal: number; gst: number; total: number; paymentMethod: string; change: number} = {
-            vendor: {
-                vendorId: vendor_info['vendorId'],
-                vendorName: vendor_info['vendorName']
-            },
-            branchLocation: branchLocation,
+        let receipt: {vendorId: string; branchLocation: string; branchId: string; branchPostal: string; items:{itemName:string;price:string;}; subtotal: string; gst: string; total: string; paymentMethod: string; change: string} = {
+            vendorId: vendorId,
             branchId: branchId,
-            branchPostal: branchPostal,
             items: final_items,
-            subtotal: subtotal_float,
-            gst: gst_float,
-            total: total_float,
+            subtotal: subtotal_float.toFixed(2),
+            gst: gst_float.toFixed(2),
+            total: total_float.toFixed(2),
             paymentMethod: payment_method,
-            change: changeNumber,
+            change: changeNumber.toFixed(2),
             
         }   
+        const receiptString: string =  JSON.stringify(receipt);
+        const hmacHex = await createHmac(receiptString, secret);
         
         const endpoint = getHttpsEndpoint('onHttpReceiptSubmit');
         await fetch(endpoint,{
@@ -199,7 +187,7 @@
                 "Nonce": nonce,
                 "HMAC": hmacHex,
             },
-            body: JSON.stringify(receipt)
+            body: receiptString
         }).then(res => {
             return res.json();
         })

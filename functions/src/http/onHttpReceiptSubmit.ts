@@ -3,7 +3,8 @@ import * as logger from 'firebase-functions/logger';
 import { webcrypto } from 'crypto';
 import { firestore } from '../firebase';
 import { onRequest } from 'firebase-functions/v2/https';
-import { FieldValue, Receipt } from '../models';
+import { FieldValue } from '../models';
+import type { Receipt, Vendor, VendorBranch } from '../models';
 
 export const onHttpReceiptSubmit = onRequest(async (req, res) => {
   const cors = (await import('cors'))({ origin: true });
@@ -24,6 +25,23 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
     const nonce = req.get('Nonce');
     const hmacHexHeader = req.get('HMAC');
     const subtle = webcrypto.subtle;
+
+    const currentDate = new Date();
+    const dateInMilis = currentDate.getTime();
+
+    if ( (dateInMilis - Number(nonce)) > 2000) {
+      logger.error(
+        'onHttpReceiptSubmit:HttpsError',
+        'forbidden',
+        'Nonce provided is invalid',
+        req.rawHeaders
+      );
+
+      return res.status(500).json({
+        status: 500,
+        message: 'Nonce provided is invalid',
+      });
+    }
 
     if (
       !apiKey ||
@@ -66,6 +84,7 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
         message: 'Missing headers \'Nonce\' and \'HMAC\'',
       });
     }
+    const data = req.body;
     const encoder = new TextEncoder();
     const encodedApiSecret = encoder.encode(apiSecret);
     const hmacKey = await subtle.importKey(
@@ -75,7 +94,8 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
       false,
       ['verify'],
     );
-    const encodedNonce = encoder.encode(nonce);
+
+    const encodedData = encoder.encode(JSON.stringify(data));
     const signatureIntArray = Uint8Array.from(
       Buffer.from(
         hmacHexHeader,
@@ -86,7 +106,7 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
       'HMAC',
       hmacKey,
       signatureIntArray,
-      encodedNonce
+      encodedData
     );
 
     if (!validHmac) {
@@ -102,9 +122,8 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
       });
     }
 
-    const data = req.body;
     const branchId = data.branchId;
-    const vendorId = data.vendor['vendorId'];
+    const vendorId = data.vendorId;
 
 
     if (
@@ -144,10 +163,34 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
         .json({ status: 400, message: 'Invalid API-Key or API-Secret' });
     }
 
-    const vendorLocation = data.branchLocation;
-    const vendorName = data.vendor.vendorName;
-    const postalCode = data.branchPostal;
+    const vendorDocRef = firestore.collection('vendors').doc(vendorId);
+    const vendorDocSnap = await vendorDocRef.get();
+    if (!vendorDocSnap.exists) {
+      logger.error(
+        'onHttpReceiptSubmit:HttpsError',
+        'not-found',
+        'provided Vendor ID Does not exist',
+        req.rawHeaders
+      );
 
+      return res.status(404).json({
+        status: 404,
+        message: 'provided Vendor ID Does not exist',
+
+      });
+    }
+    const vendorData = vendorDocSnap.data() as Vendor;
+    const vendorBranches = vendorData.branches as VendorBranch[];
+    let vendorLocation = '';
+    let postalCode = '';
+    vendorBranches.forEach( (branch) => {
+      if (branch.branchId === branchId) {
+        vendorLocation = branch.branchLocation;
+        postalCode = branch.branchPostal;
+      }
+    });
+
+    const vendorName = vendorData.vendorName;
     const items = data.items;
     const subtotal = data.subtotal;
     const gst = data.gst;
