@@ -1,11 +1,9 @@
 <!--PAGE IS TO BE DISPLAYED IN 1180 x 820 RESOLUTION-->
 
 <script lang="ts">
-    import { functions } from '$lib/firebase';
-    import { httpsCallable } from 'firebase/functions';
-
     import { goto } from '$app/navigation';
     import { authStore } from '$lib/stores';
+    import { getHttpsEndpoint } from '$lib/firebase/functions';
 
     $:{if($authStore === null){
         goto('/')
@@ -191,7 +189,8 @@
             
         }   
         
-        await fetch('https://onhttpreceiptsubmit-zuffjtk3wq-as.a.run.app',{
+        const endpoint = getHttpsEndpoint('onHttpReceiptSubmit');
+        await fetch(endpoint,{
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

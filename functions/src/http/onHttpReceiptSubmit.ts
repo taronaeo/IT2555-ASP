@@ -181,7 +181,7 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
       logger.error(error);
       return res
         .status(500)
-        .json({ status: 500, message: 'Internal server error ' });
+        .json({ status: 500, message: 'Internal server error' });
     }
   });
 });
