@@ -29,5 +29,5 @@ export const getHttpsEndpoint = (
     throw new Error('Missing `endpoint` parameter');
 
   if (dev) return `http://127.0.0.1:5001/it2555-asp/${region}/${endpoint}`;
-  return `https://${region}-it2555-asp.cloudfunctions.net/${endpoint.toLowerCase()}`;
+  return `https://${region}-it2555-asp.cloudfunctions.net/${endpoint}`;
 };
