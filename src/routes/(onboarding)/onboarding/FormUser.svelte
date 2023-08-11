@@ -1,10 +1,21 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import { FormInput } from '$lib/components';
   import { authStore } from '$lib/stores';
-  import {
-    state,
+  import { firestore } from '$lib/firebase';
+  import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
+  import { createForm } from 'svelte-forms-lib';
+
+  import { validateZod } from '$lib/forms';
+  import { FormInput } from '$lib/components';
+  import { state, schema } from './FormUser';
+
+  onMount(() => {
+    updateField('displayName', $authStore?.displayName);
+    updateField('phoneNumber', $authStore?.phoneNumber);
+  });
+
+  const {
     form,
     errors,
     updateField,
@@ -12,11 +23,23 @@
     isSubmitting,
     handleChange,
     handleSubmit,
-  } from './FormUser';
+  } = createForm({
+    initialValues: {
+      displayName: '',
+      phoneNumber: '',
+    },
+    validate: (data) => validateZod(schema, data),
+    onSubmit: (data) => {
+      const userRef = doc(firestore, `users/${$authStore?.uid}`);
+      const transformed = schema.parse(data);
 
-  onMount(() => {
-    updateField('displayName', $authStore?.displayName);
-    updateField('phoneNumber', $authStore?.phoneNumber);
+      return setDoc(userRef, {
+        ...$authStore,
+        ...transformed,
+        isOnboarded: true,
+        updatedAt: serverTimestamp(),
+      }).catch((error) => console.error(error));
+    },
   });
 </script>
 

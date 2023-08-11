@@ -1,5 +1,6 @@
 <script lang="ts">
   import FormUser from './FormUser.svelte';
+  import FormVendor from './FormVendor.svelte';
 
   import { authStore } from '$lib/stores';
   import { AuthTenant } from '$lib/constants';
@@ -22,9 +23,9 @@
     {/if}
   </div>
 
-  {#if $authStore?.tenantId === null}
+  {#if $authStore?.tenantId === AuthTenant.USER}
     <FormUser />
+  {:else if $authStore?.tenantId === AuthTenant.VENDOR}
+    <FormVendor />
   {/if}
-
-  <!-- TODO: Add Vendors form -->
 </section>

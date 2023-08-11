@@ -1,4 +1,4 @@
-import type { User } from '$lib/models';
+import type { User, Vendor } from '$lib/models';
 import type {
   Query,
   DocumentData,
@@ -15,6 +15,11 @@ export const colUsers = collection(
   firestore,
   FirestoreCollection.USERS
 ) as CollectionReference<User>;
+
+export const colVendors = collection(
+  firestore,
+  FirestoreCollection.VENDORS
+) as CollectionReference<Vendor>;
 
 export const colReceipts = collection(
   firestore,

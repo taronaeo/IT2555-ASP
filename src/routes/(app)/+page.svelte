@@ -1,6 +1,6 @@
 <script>
   import { goto } from '$app/navigation';
-  import { authStore } from '$lib/stores';
+  import { authStore, vendorStore } from '$lib/stores';
 
   import { AuthTenant } from '$lib/constants';
   import { signOut, continueAuth } from '$lib/firebase/auth';
@@ -17,6 +17,8 @@
 
 <section>
   <pre>{JSON.stringify($authStore, null, 2)}</pre>
+
+  <pre>{JSON.stringify($vendorStore, null, 2)}</pre>
 
   {#if $authStore !== null}
     <button on:click={onSignOut}>Logout</button>

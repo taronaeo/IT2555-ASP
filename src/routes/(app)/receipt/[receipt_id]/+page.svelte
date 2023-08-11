@@ -1,40 +1,64 @@
 <script>
     import { firestore } from '$lib/firebase'
     import { goto } from '$app/navigation'
-    import { getDoc, doc } from 'firebase/firestore'
+    import { getDoc, doc, serverTimestamp, updateDoc } from 'firebase/firestore'
     import { page } from '$app/stores';
     import { authStore } from '$lib/stores';
     import { getStorage, ref, getDownloadURL } from "firebase/storage";
-    import { AniIconLoading } from '$lib/icons'
-  
+    import { AniIconLoading } from '$lib/icons';
+    import { httpsCallable } from 'firebase/functions';
+    import { functions } from '$lib/firebase';
+    import dayjs from 'dayjs';
 
+    $:if ($authStore === null){
+        goto('/account/signin')
+    }
+    const userUid = $authStore?.uid;
     const storage = getStorage()
     let isHovered=false;
 
     const current_receipt_id = $page.params.receipt_id;
     
-    const docRef = doc(firestore, 'receipts', current_receipt_id);
+
+    let assigned = true;
 
     async function docSnap(){
-        try{
-            await getDoc(docRef)
-        }
-        catch{
-            goto('/')
-        }
-            const snap = await getDoc(docRef)
-            const data = snap.data()
-            const date_obj = data['createdAt'].toDate();
-            const date = (date_obj).toISOString().split('T')[0];
-            const time = `${date_obj.getHours()}:${date_obj.getMinutes()}`
-            const fileSnap = await getDownloadURL(ref(storage, `VendorLogos/${data.vendor.vendorId}.svg`))
+            
+
+            const onReceiptViewCallable = httpsCallable(
+                functions,
+                'onReceiptViewCallable'
+            );
+            const receiptData = await onReceiptViewCallable(current_receipt_id).catch(
+                (err) => {
+                    console.log(err);
+                    goto('/')
+                }
+            )
+
+
+            const data = receiptData.data;
+            const date = dayjs(data.createdAt).format('YYYY/MM/DD');
+            const time = dayjs(data.createdAt).format('hh:mm');
+            const fileSnap = await getDownloadURL(ref(storage, `VendorLogos/${data.vendor.vendorId}.svg`));
+            if(!data.userUid){
+                assigned=false  ;
+            }
             return [data, fileSnap, date, time]
     }
     let promise = docSnap();
 
+    async function assignReceipt(){
+        const receiptRef = doc(firestore, 'receipts', current_receipt_id);
+        updateDoc(
+            receiptRef, {
+            userUid: userUid}
+        ).then(()=>{window.location.reload()});
+    }
+
 
 </script>
-
+<div class="px-4">
 <div class="md:grid md:gap-8 md:grid-cols-2 md:grid-rows-3">
 
 
@@ -130,9 +154,16 @@
         Download as PDF</button>
     </div>
 
-    <div class="md:h-28  md:my-0 my-3 border-2  px-3 py-3 shadow rounded-lg">
-        <div class="text-center ">Have troubles with this receipt?</div>
-        <div class="text-center"><button class="md:mt-3 border-2 bg-emerald-600 px-5 py-2.5  m-2 text-white rounded-lg text-center ">Contact Support</button></div>
+            <div class="md:h-28  md:my-0 my-3 border-2  px-3 py-3 shadow rounded-lg">
+                <div class:hidden={!assigned}>
+                    <div class="text-center ">Have troubles with this receipt?</div>
+                    <div class="text-center"><button class="md:mt-3 border-2 bg-emerald-600 px-5 py-2.5  m-2 text-white rounded-lg text-center ">Contact Support</button></div>
+                </div>
+                <div class:hidden={assigned}>
+                    <div class="text-center ">Want to assign receipt to account?</div>
+                    <div class="text-center"><button on:click={()=>{assignReceipt()}} class="md:mt-3 border-2 bg-emerald-600 px-5 py-2.5  m-2 text-white rounded-lg text-center ">Assign to Account</button></div>
+                </div>
+            </div>
     </div>
-    </div>
+</div>
 </div>
