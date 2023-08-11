@@ -32,13 +32,13 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
     if ( (dateInMilis - Number(nonce)) > 2000) {
       logger.error(
         'onHttpReceiptSubmit:HttpsError',
-        'forbidden',
+        'failed-precondition',
         'Nonce provided is invalid',
         req.rawHeaders
       );
 
-      return res.status(500).json({
-        status: 500,
+      return res.status(412).json({
+        status: 412,
         message: 'Nonce provided is invalid',
       });
     }
@@ -168,14 +168,14 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
     if (!vendorDocSnap.exists) {
       logger.error(
         'onHttpReceiptSubmit:HttpsError',
-        'not-found',
+        'forbidden',
         'provided Vendor ID Does not exist',
         req.rawHeaders
       );
 
-      return res.status(404).json({
-        status: 404,
-        message: 'provided Vendor ID Does not exist',
+      return res.status(403).json({
+        status: 403,
+        message: 'Forbidden',
 
       });
     }
