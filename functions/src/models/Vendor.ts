@@ -1,4 +1,5 @@
-import type { FieldValue } from 'firebase/firestore';
+import type { FieldValue } from './Metadata';
+
 export interface Vendor {
   readonly vendorId: string;
   readonly vendorUen: string;
@@ -12,7 +13,6 @@ export interface Vendor {
   stripeStatus: string;
   stripeItemId: string;
 
-  category: string;
   branches: VendorBranch[] | null;
   apiKeys: VendorApiKey[] | null;
   branchCreatedAt: FieldValue;

@@ -1,24 +1,13 @@
-<script lang="ts">
-    import { or } from "firebase/firestore";
-    import { stringify } from "postcss";
+<!--PAGE IS TO BE DISPLAYED IN 1180 x 820 RESOLUTION-->
 
+<script lang="ts">
     import { goto } from '$app/navigation';
     import { authStore } from '$lib/stores';
+    import { getHttpsEndpoint } from '$lib/firebase/functions';
 
-
-    import type { ReceiptItem } from "$lib/models/item";
-    import type { Receipt } from "$lib/models/receipt";
-
-    import { FieldValue, serverTimestamp } from "firebase/firestore";
-
-    let userUid:string = ''
-
-    if(!$authStore){
+    $:{if($authStore === null){
         goto('/')
-    }
-    else{
-        userUid = $authStore.uid
-    }
+    }}
     
     let editing:boolean = false;
     let selected:boolean = false;
@@ -39,17 +28,21 @@
     
     let total_float:number = 0;
     let total_str:string = "";
+    
+    let imgSrcBase64 ="";
+
+    let generatedReceipt = ""
 
     const vendor_info: {vendorId: string; vendorName: string;} = {
-        vendorId: "FairPriceNTUC",
+        vendorId: "6NzEgyX2iDfMqUfqF2dx",
         vendorName: "NTUC Fairprice",
     }
     const branch_info: {branchId: string; branchLocation: string; branchPostal: number; key: string; secret: string;}={
-        branchId: 'MandarinGallery',
+        branchId: 'AuriFactory',
         branchLocation: '33A Orchard Road, #03-13, Mandarin Gallery',
         branchPostal: 123123,
-        key: 'spiderman',
-        secret: 'kurasaki'
+        key: 'atcO7#sOpn+SzV*W',
+        secret: 'hUwcPn$1uf17s4|k'
 
     }
 
@@ -84,9 +77,9 @@
         {"itemName": "Coleslaw","price":6.00}
 ]
 
-    $:{
+    $:{ subtotal_float = 0;
         ordered_items.forEach(item=>{
-            console.log(ordered_items)
+            
             quantity_of_item+=1
             let item_name: string = item["item"]
             let item_price: number = 0;
@@ -99,9 +92,9 @@
             quantity_of_item = item["quantity"]
             subtotal_float += (item_price * quantity_of_item)
             subtotal_float = Math.round(subtotal_float * 100) / 100
-            gst_float = subtotal_float*0.08
-            gst_float = Math.round(gst_float * 100) / 100
-            total_float = Math.round((gst_float + subtotal_float)*100/100)
+            gst_float = subtotal_float*100*0.08
+            gst_float = (gst_float / 100)
+            total_float = gst_float + subtotal_float
 
         })
         subtotal_str = '$' + subtotal_float.toFixed(2)
@@ -109,7 +102,17 @@
         total_str = '$' + total_float.toFixed(2)
     }
 
+    async function generateQR(receiptId:string){
+        qrExpired=false
+        const imgSrc = await fetch(`/api/qr-generation?receiptId=${receiptId}`,{
+            method: "GET",
+        });
+        imgSrcBase64 = await imgSrc.text();
+        setTimeout(() => {
+            qrExpired = true;
+        }, 60000)
 
+    }
 
     async function callAPI(){
         
@@ -119,7 +122,7 @@
         const key: string = branch_info['key']
         const secret: string = branch_info['secret']
 
-        let final_items:ReceiptItem[]= []
+        let final_items = []
         ordered_items.forEach(item =>{
             let item_price: number = 0;
 
@@ -132,7 +135,7 @@
           let receipt_item:{itemName: string; price: number} = {
             'itemName': item['item'],
             'price': item_price
-          } satisfies ReceiptItem   
+          }
           for(let i = 0; i < item['quantity'];i++){
            final_items.push(receipt_item)
           }
@@ -140,8 +143,7 @@
         })
 
         
-        let receipt: {userUid: string;vendor: {vendorId: string; vendorName: string;}; branchLocation: string; branchId: string; branchPostal: number; items:ReceiptItem[]; subtotal: number; gst: number; total: number; paymentMethod: string; change: number} = {
-            userUid: userUid,
+        let receipt: {vendor: {vendorId: string; vendorName: string;}; branchLocation: string; branchId: string; branchPostal: number; items:ReceiptItem[]; subtotal: number; gst: number; total: number; paymentMethod: string; change: number} = {
             vendor: {
                 vendorId: vendor_info['vendorId'],
                 vendorName: vendor_info['vendorName']
@@ -154,29 +156,69 @@
             gst: gst_float,
             total: total_float,
             paymentMethod: payment_method,
-            change: 0,
+            change: changeNumber,
             
-        }
-
-        const response = await fetch('api/epos-upload',{
+        }   
+        
+        const endpoint = getHttpsEndpoint('onHttpReceiptSubmit');
+        await fetch(endpoint,{
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "api_key": key,
-                "api_secret": secret
+                "API-Key": key,
+                "API-Secret": secret,
             },
             body: JSON.stringify(receipt)
+        }).then(res => {
+            return res.json();
         })
-        
-        const data = await response.json()
-        console.log(data)
+          .then(data =>{
+            if(data.status != 200){
+                throw Error(`API Endpoint returned ${data.status}, with ${data.message}`)
+            }   
+            generateQR(data.message);
+            generatedReceipt = data.message;
+          }).catch(err => {
+            validQR = false;
+            console.error(err);
+          })
+    }
+    let paymentSuccess = false;
+    let cashPaymentSuccess = false;
+    let validQR = true;
+    let cash = false;
+    let creditPaymentSuccess = false;
+    
+    let cashAmount = 0;
+    let change = 0;
+    
+    let changeFixed: string = '';
+    let changeNumber:number = 0
 
-        
+    function calculateChange(cash){
+        if (cash<total_float){
+            change = 0;
+            return
+        }
+        change = cash - total_float
+        changeFixed = change.toFixed(2)
+        changeNumber = Number(changeFixed)
+    }
+    
+    function validateCash(){
+        if(cashAmount<total_float){
+            return
+        }
+        cashPaymentSuccess = true;
+        callAPI();
         
     }
 
-
-
+    let qrExpired = false;
+    
+    function regenQR(receiptId){
+        generateQR(receiptId)
+    }
 
 </script>
 
@@ -214,17 +256,101 @@ ePOS v34.2.3
 
     </div>
 </div>
-<div class:hidden={!    paynow} class="fixed inset-0 w-full bg-black/50">
-    <div class="text-center font-bold absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-zinc-300 py-12 px-32 border-2 border-t-black border-l-black border-b-white border-r-white text-xl">
+<div class:hidden={!paynow} class="fixed flex justify-center items-center inset-0 w-full bg-black/50">
+    <div class:hidden={paymentSuccess} class="text-center font-bold bg-zinc-300 py-12 px-32 border-2 border-t-black border-l-black border-b-white border-r-white text-xl">
         Scan QR Code for payment
         <div>
-        <img on:click={callAPI} src="example-qr.jpeg" class="mt-4">
+        <img on:click={()=>{paymentSuccess=true;}} on:click={callAPI}  src="example-qr.png" class="mt-4 text-center h-72"> <!--on:click={callAPI}-->
         </div>
         <button on:click = {()=>{paynow=false}} class=" w-32 mt-2 flex justify-center m-auto font-bold border-b-2 border-2 border-zinc-600 border-l-white border-t-white bg-red-700 rounded px-8 py-3 text-2xl text-zinc-100">
             Cancel
         </button>
     </div>
+    <div class:hidden={!paymentSuccess} class="text-center font-bold w-4/5 bg-zinc-300 py-12 px-32 border-2 border-t-black border-l-black border-b-white border-r-white text-xl">
+        {#if validQR && !qrExpired}
+        <div class="font-bold">
+            Payment Successful! Scan QR Code for Dr Receipts
+            <img class="inline text-center h-72 my-6" src="data:image/png;base64, {imgSrcBase64}"><br>
+            You have 1 minute to scan the QR code before it becomes invalid.
+        </div>
+            {:else if !validQR}
+            <div class="font-bold">ERROR OCCURRED</div>
+            <div class="font-bold">RECEIPT COULD NOT BE GENERATED</div>
+        {/if}
+        {#if qrExpired}
+        <div class="font-bold m-auto flex justify-center">Time to scan ran out, request staff for assistance</div>
+        <div class="block text-center">
+            <button on:click = {()=>{regenQR(generatedReceipt)}} class=" w-48 mt-2 mr-1 m-auto font-bold border-b-2 border-2 border-zinc-600 border-l-white border-t-white bg-blue-600 rounded px-8 py-3 text-2xl text-zinc-100">
+                Regenerate QR
+            </button>
+        </div>
+        {/if}   
+    </div>
 </div>
+
+<div class:hidden={!cash} class="fixed flex justify-center items-center inset-0 w-full bg-black/50">
+    <div class:hidden={cashPaymentSuccess} class="text-center font-bold bg-zinc-300 py-12 px-32 border-2 border-t-black order-l-black border-b-white border-r-white text-xl">
+        <div>Enter Cash Amount</div><br>
+        <div class="font-normal">Change: <input readonly bind:value={changeFixed} class="bg-zinc-300"></div>
+        <input bind:value={cashAmount} on:input={()=>calculateChange(cashAmount)} class="text-center m-auto block mt-6 bg-zinc-100 border-zinc-400 border-2">
+        <div class="flex flex-row my-2">
+        <button on:click = {()=>{validateCash()}} class=" w-32 mt-2 mr-1 flex justify-center m-auto font-bold border-b-2 border-2 border-zinc-600 border-l-white border-t-white bg-blue-600 rounded px-8 py-3 text-2xl text-zinc-100">
+            Confirm
+        </button>
+        <button on:click = {()=>{cash=false}} class=" w-32 mt-2 ml-1 flex justify-center m-auto font-bold border-b-2 border-2 border-zinc-600 border-l-white border-t-white bg-red-700 rounded px-8 py-3 text-2xl text-zinc-100">
+            Cancel
+        </button>
+        </div>
+    </div>
+    <div class:hidden={!cashPaymentSuccess} class="text-center font-bold w-4/5 bg-zinc-300 py-12 px-32 border-2 border-t-black border-l-black border-b-white border-r-white text-xl">
+        {#if validQR && !qrExpired}
+        <div class="font-bold">
+            Payment Successful! Scan QR Code for Dr Receipts
+            <img class="inline text-center h-72 my-6" src="data:image/png;base64, {imgSrcBase64}"><br>
+            You have 1 minute to scan the QR code before it becomes invalid.
+        </div>
+            {:else if !validQR}
+            <div class="font-bold">ERROR OCCURRED</div>
+            <div class="font-bold">RECEIPT COULD NOT BE GENERATED</div>
+        {/if}  
+        {#if qrExpired}
+        <div class="font-bold m-auto flex justify-center">Time to scan ran out, request staff for assistance</div>
+        <div class="block text-center">
+            <button on:click = {()=>{regenQR(generatedReceipt)}} class=" w-48 mt-2 mr-1 m-auto font-bold border-b-2 border-2 border-zinc-600 border-l-white border-t-white bg-blue-600 rounded px-8 py-3 text-2xl text-zinc-100">
+                Regenerate QR
+            </button>
+        </div>
+        {/if}   
+    </div>
+
+
+</div>
+
+<div class:hidden={!creditPaymentSuccess} class="fixed flex justify-center items-center inset-0 w-full bg-black/50">
+    <div  class="text-center font-bold w-4/5 bg-zinc-300 py-12 px-32 border-2 border-t-black border-l-black border-b-white border-r-white text-xl">
+        {#if validQR && !qrExpired}
+        <div class="font-bold">
+            Payment Successful! Scan QR Code for Dr Receipts
+            <img class="inline text-center h-72 my-6" src="data:image/png;base64, {imgSrcBase64}"><br>
+            You have 1 minute to scan the QR code before it becomes invalid.
+        </div>
+            {:else if !validQR}
+            <div class="font-bold">ERROR OCCURRED</div>
+            <div class="font-bold">RECEIPT COULD NOT BE GENERATED</div>
+        {/if}  
+        {#if qrExpired}
+        <div class="font-bold m-auto flex justify-center">Time to scan ran out, request staff for assistance</div>
+        <div class="block text-center">
+            <button on:click = {()=>{regenQR(generatedReceipt)}} class=" w-48 mt-2 mr-1 m-auto font-bold border-b-2 border-2 border-zinc-600 border-l-white border-t-white bg-blue-600 rounded px-8 py-3 text-2xl text-zinc-100">
+                Regenerate QR
+            </button>
+        </div>
+        {/if}   
+    </div>
+
+    
+</div>
+
 <div class="p-4 h-screen pt-12 bg-zinc-400 grid grid-cols-5 gap-x-2">
     
     <div class="col-span-3">
@@ -283,12 +409,12 @@ ePOS v34.2.3
             <div class="w-14 h-14 bg-zinc-100 rounded-lg flex items-center justify-center text-5xl font-bold">9</div>
         </div>
         <div class="grid grid-cols-2 gap-y-3 gap-x-3">
-            <div on:click={callAPI} on:click={()=>{payment_method = "Cash"}} class:hidden={!payment} class="flex items-center justify-center flex-col font-bold text-3xl bg-zinc-300 h-40 text-center border-2 border-t-zinc-600 border-l-zinc-600 border-r-white border-b-white">
+            <div on:click={() => {cash=true}} on:click={()=>{payment_method = "Cash"}} class:hidden={!payment} class="flex items-center justify-center flex-col font-bold text-3xl bg-zinc-300 h-40 text-center border-2 border-t-zinc-600 border-l-zinc-600 border-r-white border-b-white">
                 <div><img src = "cash.svg" class="h-16"></div>
                 <div>Cash</div>
                 
             </div>
-            <div on:click={callAPI} on:click={()=>{payment_method = "Credit Card"}} class:hidden={!payment} class="flex items-center justify-center flex-col font-bold text-3xl bg-zinc-300 h-40 text-center border-2 border-t-zinc-600 border-l-zinc-600 border-r-white border-b-white">
+            <div  on:click={()=>{payment_method = "Credit Card"}} on:click={()=>{callAPI();creditPaymentSuccess=true;}} class:hidden={!payment} class="flex items-center justify-center flex-col font-bold text-3xl bg-zinc-300 h-40 text-center border-2 border-t-zinc-600 border-l-zinc-600 border-r-white border-b-white">
                 <div class="-m-4"><img src = "visa.svg" class="h-24 inline"> <img src ="mastercard.svg" class="h-12 inline "></div>
                 <div>Credit Card</div>
             </div>
@@ -299,7 +425,7 @@ ePOS v34.2.3
 
         </div>
         <div class:hidden={payment} class="text-center gap-x-3 grid grid-cols-10 gap-y-3">
-            <div class="w-14 h-14 bg-emerald-600 text-white text-lg rounded-lg flex items-center justify-center ">Pasta</div>
+            <div class="w-14 h-14 bg-zinc-600 text-white text-lg rounded-lg flex items-center justify-center ">Pasta</div>
             <div on:click={()=>{
                 let item_count = 0;
                 ordered_items.forEach(item=>{
@@ -332,7 +458,7 @@ ePOS v34.2.3
             <div class="w-14 h-14 font-bold rounded-lg flex items-center justify-center "></div>
             <div class="w-14 h-14 font-bold rounded-lg flex items-center justify-center "></div>
 
-            <div class="w-14 h-14 bg-emerald-600 text-white text-lg rounded-lg flex items-center justify-center ">Steak</div>
+            <div class="w-14 h-14 bg-zinc-600 text-white text-lg rounded-lg flex items-center justify-center ">Steak</div>
             <div on:click={()=>{
                 let item_count = 0;
                 ordered_items.forEach(item=>{
@@ -398,7 +524,7 @@ ePOS v34.2.3
             <div class="w-14 h-14 text-sm font-bold rounded-lg flex items-center justify-center break-all "></div>
             <div class="w-14 h-14 text-sm font-bold rounded-lg flex items-center justify-center break-all "></div>
 
-            <div class="w-14 h-14 bg-emerald-600 text-white text-lg rounded-lg flex items-center justify-center ">Pizza</div>
+            <div class="w-14 h-14 bg-zinc-600 text-white text-lg rounded-lg flex items-center justify-center ">Pizza</div>
             <div on:click={()=>{
                 let item_count = 0;
                 ordered_items.forEach(item=>{
@@ -431,7 +557,7 @@ ePOS v34.2.3
             <div class="w-14 h-14 text-sm font-bold rounded-lg flex items-center justify-center break-all "></div>
             <div class="w-14 h-14 text-sm font-bold rounded-lg flex items-center justify-center break-all "></div>
 
-            <div class="w-14 h-14 bg-emerald-600 text-white text-lg rounded-lg flex items-center justify-center ">Meats</div>
+            <div class="w-14 h-14 bg-zinc-600 text-white text-lg rounded-lg flex items-center justify-center ">Meats</div>
             <div on:click={()=>{
                 let item_count = 0;
                 ordered_items.forEach(item=>{
@@ -508,7 +634,7 @@ ePOS v34.2.3
             <div class="w-14 h-14 text-sm font-bold rounded-lg flex items-center justify-center break-all "></div>
             <div class="w-14 h-14 text-sm font-bold rounded-lg flex items-center justify-center break-all "></div>
             
-            <div class="w-14 h-14 bg-emerald-600 text-white text-lg rounded-lg flex items-center justify-center ">Burger</div>
+            <div class="w-14 h-14 bg-zinc-600 text-white text-lg rounded-lg flex items-center justify-center ">Burger</div>
             <div on:click={()=>{
                 let item_count = 0;
                 ordered_items.forEach(item=>{
@@ -574,7 +700,7 @@ ePOS v34.2.3
             <div class="w-14 h-14 text-sm font-bold rounded-lg flex items-center justify-center break-all "></div>
             <div class="w-14 h-14 text-sm font-bold rounded-lg flex items-center justify-center break-all "></div>
 
-            <div class="w-14 h-14 bg-emerald-600 text-white text-lg rounded-lg flex items-center justify-center ">Soup</div>
+            <div class="w-14 h-14 bg-zinc-600 text-white text-lg rounded-lg flex items-center justify-center ">Soup</div>
             <div on:click={()=>{
                 let item_count = 0;
                 ordered_items.forEach(item=>{
@@ -618,7 +744,7 @@ ePOS v34.2.3
             <div class="w-14 h-14 text-sm font-bold rounded-lg flex items-center justify-center break-all "></div>
             <div class="w-14 h-14 text-sm font-bold rounded-lg flex items-center justify-center break-all "></div>
 
-            <div class="w-14 h-14 bg-emerald-600 text-white text-lg rounded-lg flex items-center justify-center ">Sides</div>
+            <div class="w-14 h-14 bg-zinc-600 text-white text-lg rounded-lg flex items-center justify-center ">Sides</div>
             <div on:click={()=>{
                 let item_count = 0;
                 ordered_items.forEach(item=>{
@@ -751,10 +877,12 @@ ePOS v34.2.3
             </div>
         </div>
 
-        <button on:click = {()=>{payment=true}} class="min-h-[80px] w-full flex items-center justify-center font-bold border-b-2 border-2 border-zinc-600 border-l-white border-t-white bg-blue-600 rounded px-8 py-3 text-2xl text-zinc-100 mt-1">
+        <button class:hidden={payment} on:click = {()=>{if(ordered_items.length > 0){payment=true}}} class="min-h-[80px] w-full flex items-center justify-center font-bold border-b-2 border-2 border-zinc-600 border-l-white border-t-white bg-blue-600 rounded px-8 py-3 text-2xl text-zinc-100 mt-1">
         Proceed to Payment
         </button>
-
+        <button class:hidden={!payment} on:click = {()=>{payment=false}} class="min-h-[80px] w-full flex items-center justify-center font-bold border-b-2 border-2 border-zinc-600 border-l-white border-t-white bg-blue-600 rounded px-8 py-3 text-2xl text-zinc-100 mt-1">
+            Back
+        </button>
     </div>
 
 
