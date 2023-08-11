@@ -4,17 +4,20 @@
   import { goto } from '$app/navigation';
   import { authStore } from '$lib/stores';
   import { AniIconLoading } from '$lib/icons';
+  import { z } from 'zod';
 
-  import crypto from 'crypto';
+  
   let userUid:string = ""
-
+  
   if(!$authStore){
         goto('/')
     }
   else{
       userUid = $authStore.uid
   }
-
+  if(!$authStore?.isOnboarded){
+    goto('/onboarding')
+  }
   
 
   let branches = [];
@@ -180,29 +183,49 @@ function next_page(){
   let inputCreationId:string = "";
 
   let inputCreationLocation:string = "";
-  let inputCreationPostal: number | undefined;
+  let inputCreationPostal: string = "";
   let invalid: boolean = false;
   let alert: string = "";
+
+  const branchSchema = z.object({
+    id: z
+      .string()
+      .min(2, 'ID must be at least 2 characters')
+      .max(25, 'ID cannot exceed 15 characters')
+      .refine(id => !id.includes(' '), 'ID cannot contain a space'),
+    location: z.string().min(2, 'Location must be at least 2 characters'),
+    postalCode: z
+      .string({ required_error: 'Postal code is required' })
+      .min(6, 'Invalid postal code. Only valid 6-digital SG postal code is allowed.')
+      .max(6, 'Invalid postal code. Only valid 6-digital SG postal code is allowed.')
+      .refine(
+        (postalCode) => {
+          const parsedPostalCode = Number(postalCode);
+          if (isNaN(parsedPostalCode)) return false;
+          if (parsedPostalCode <= 100000) return false;
+          if (parsedPostalCode >= 999999) return false;
+          return true;
+        },
+        {
+          message:
+            'Invalid postal code. Only valid 6-digital SG postal code is allowed.',
+        }
+      ),
+  });
   async function createBranch(){
-    if(inputCreationId.length === 0){
+    const inputBranches = branchSchema.safeParse({
+      id: inputCreationId,
+      location: inputCreationLocation,
+      postalCode: inputCreationPostal
+    });
+    if(inputCreationId.length === 0 || inputCreationLocation.length === 0){
       invalid = true;
-      alert = "Fill in all fields!"
+      alert = "Fill in all fields"
       return
     }
-    if(inputBranchId.length > 15){
+    if (!inputBranches.success) {
       invalid = true;
-      alert = "ID cannot be more than 15 characters long";
-      return
-    }
-    if(isNaN(parseInt(inputCreationPostal))){
-      invalid = true;
-      alert = "Postal Code must be number";
-      return
-    }
-    inputCreationPostal = parseInt(inputCreationPostal);
-    if(100000 > inputCreationPostal || inputCreationPostal > 999999){
-      invalid = true;
-      alert = "Input valid Singaporean 6-digit postal code";
+      alert = inputBranches.error.issues[0].message;
       return
     }
     const vendorId = await get_vendor_id();
@@ -237,7 +260,7 @@ function next_page(){
       alert = "Branch already exists!"
       return
     }
-
+    
   }
 
   async function genApiKey(branchId: string){
@@ -295,6 +318,10 @@ function next_page(){
         return;
       }
     })
+  }
+  
+  function hasWhiteSpace(branchId) {
+    return /\s/g.test(branchId);
   }
 
 

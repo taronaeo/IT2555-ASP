@@ -21,7 +21,7 @@ export interface Vendor {
 export interface VendorBranch {
   readonly branchId: string;
   branchLocation: string;
-  branchPostal: number;
+  branchPostal: string;
 }
 
 export interface VendorApiKey {

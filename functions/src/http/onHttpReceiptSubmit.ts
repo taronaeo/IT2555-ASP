@@ -2,7 +2,7 @@ import * as logger from 'firebase-functions/logger';
 
 import { firestore } from '../firebase';
 import { onRequest } from 'firebase-functions/v2/https';
-import { FieldValue } from '../models';
+import { FieldValue, Receipt } from '../models';
 
 export const onHttpReceiptSubmit = onRequest(async (req, res) => {
   const cors = (await import('cors'))({ origin: true });
@@ -33,38 +33,34 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
         req.rawHeaders
       );
 
-      res.status(400).json({
+      return res.status(400).json({
         status: 400,
         message: 'Missing headers \'API-Key\' and \'API-Secret\'',
       });
     }
 
     const data = req.body;
-    const userId = data.userUid;
     const branchId = data.branchId;
     const vendorId = data.vendor['vendorId'];
 
     if (
-      !userId ||
       !branchId ||
       !vendorId ||
-      typeof userId !== 'string' ||
       typeof branchId !== 'string' ||
       typeof vendorId !== 'string' ||
-      userId.length === 0 ||
       branchId.length === 0 ||
       vendorId.length === 0
     ) {
       logger.error(
         'onHttpReceiptSubmit:HttpsError',
         'invalid-argument',
-        'Missing body \'userUid\', \'branchId\', \'vendorId\'',
+        'Missing body \'branchId\', \'vendorId\'',
         req.rawHeaders
       );
 
-      res.status(400).json({
+      return res.status(400).json({
         status: 400,
-        message: 'Missing body \'userUid\', \'branchId\', \'vendorId\'',
+        message: 'Missing body \'branchId\', \'vendorId\'',
       });
     }
 
@@ -79,7 +75,7 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
 
     const querySnapshot = await query.get();
     if (querySnapshot.docs.length === 0) {
-      res
+      return res
         .status(400)
         .json({ status: 400, message: 'Invalid API-Key or API-Secret' });
     }
@@ -97,7 +93,7 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
 
     const receiptDoc = receiptsRef.doc();
     const receiptData = {
-      userUid: userId,
+      userUid: null,
       receiptId: receiptDoc.id,
       vendor: {
         vendorId,
@@ -112,14 +108,16 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
       change,
       paymentMethod,
       createdAt: FieldValue.serverTimestamp(),
-    };
+    } satisfies Receipt;
 
     try {
       await receiptDoc.set(receiptData, { merge: true });
-      res.status(200).json({ status: 200, message: receiptDoc.id });
+      return res.status(200).json({ status: 200, message: receiptDoc.id });
     } catch (error) {
       logger.error(error);
-      res.status(500).json({ status: 500, message: 'Internal server error ' });
+      return res
+        .status(500)
+        .json({ status: 500, message: 'Internal server error' });
     }
   });
 });

@@ -2,7 +2,11 @@ import type { FormState } from '$lib/forms';
 
 import { z } from 'zod';
 import { writable } from 'svelte/store';
+import { createForm } from 'svelte-forms-lib';
 import { formatNumber, isValidPhoneNumber } from 'libphonenumber-js';
+
+import { validateZod } from '$lib/forms';
+import { getHttpsCallable } from '$lib/firebase/functions';
 
 export const state = writable<FormState>({
   isLoading: false,
@@ -45,4 +49,33 @@ export const schema = z.object({
     .string({ required_error: 'Please enter your card cvc' })
     .min(3, 'Are you sure you have entered a valid card cvc?')
     .max(3, 'Are you sure you have entered a valid card cvc?'),
+});
+
+export const {
+  form,
+  errors,
+  isValidating,
+  isSubmitting,
+  handleChange,
+  handleSubmit,
+} = createForm({
+  initialValues: {
+    vendorUen: '',
+    vendorName: '',
+    vendorCategory: '',
+    vendorPhoneNumber: '',
+    cardNumber: '',
+    cardExpMonth: '',
+    cardExpYear: '',
+    cardCvc: '',
+  },
+  validate: (data) => validateZod(schema, data),
+  onSubmit: (data) => {
+    const transformed = schema.parse(data);
+    const onboardCallable = getHttpsCallable('onVendorOnboardingCallable');
+
+    return onboardCallable(transformed).catch((err) =>
+      state.update((s) => ({ ...s, errorMessage: err }))
+    );
+  },
 });

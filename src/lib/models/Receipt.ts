@@ -7,7 +7,7 @@ export interface Receipt extends Pick<Metadata, 'createdAt'> {
     vendorId: string;
     vendorLocation: string;
     vendorName: string;
-    postalCode: number;
+    postalCode: string;
   };
   readonly items: Array<{
     itemName: string;
