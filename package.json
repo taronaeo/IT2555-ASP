@@ -6,7 +6,7 @@
 	"scripts": {
 		"dev": "npm-run-all -p dev:web dev:firebase dev:functions",
 		"dev:web": "vite dev",
-		"dev:firebase": "firebase emulators:start --only auth,functions,firestore,pubsub,storage,eventarc",
+		"dev:firebase": "firebase emulators:start --only auth,functions,firestore,pubsub,storage,eventarc,extensions",
 		"dev:functions": "yarn --cwd functions build:watch",
 		"build": "vite build",
 		"preview": "vite preview",
@@ -22,6 +22,7 @@
 		"dayjs": "^1.11.9",
 		"firebase": "^9.22.1",
 		"libphonenumber-js": "^1.10.38",
+		"puppeteer": "^21.0.2",
 		"qr-image": "^3.2.0",
 		"svelte-forms-lib": "^2.0.1",
 		"zod": "^3.21.4"

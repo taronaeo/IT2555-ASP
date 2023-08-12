@@ -20,3 +20,4 @@ export * from './events/onReceiptCreatedEvent';
 export * from './http/onHttpReceiptSubmit';
 export * from './callables/onVendorOnboardingCallable';
 export * from './callables/onReceiptViewCallable';
+export * from './callables/onReceiptDownloadCallable';

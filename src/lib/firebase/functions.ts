@@ -6,6 +6,7 @@ const callables = {
   onOnboardingCallable: '',
   onReceiptViewCallable: '',
   onVendorOnboardingCallable: '',
+  onReceiptDownloadCallable: '',
 };
 
 const endpoints = {

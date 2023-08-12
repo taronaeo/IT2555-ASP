@@ -6,7 +6,16 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
     match /{allPaths=**} {
-      allow read, write: if true;
+      allow create, delete: if false;
+
+      match /ReceiptPDFs/{receiptId} {
+        allow read: if request.auth.uid != null
+                    && request.auth.uid == firestore.get(/databases/(default)/documents/receipts/$(receiptId.split('.pdf')[0])).data.userUid;
+      }
+
+      match /VendorLogos/{vendorId} {
+        allow read: if request.auth != null;
+      }
     }
   }
 }
