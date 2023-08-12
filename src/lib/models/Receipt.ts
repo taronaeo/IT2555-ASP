@@ -11,13 +11,13 @@ export interface Receipt extends Pick<Metadata, 'createdAt'> {
   };
   readonly items: Array<{
     itemName: string;
-    price: number;
+    price: string;
     discount: string | null;
     remarks: string | null;
   }>;
-  readonly subtotal: number;
-  readonly gst: number;
-  readonly total: number;
+  readonly subtotal: string;
+  readonly gst: string;
+  readonly total: string;
   readonly paymentMethod: string;
-  readonly change: number;
+  readonly change: string;
 }
