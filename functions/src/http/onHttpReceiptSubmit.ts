@@ -1,15 +1,20 @@
 import * as logger from 'firebase-functions/logger';
 
+import { webcrypto } from 'crypto';
 import { firestore } from '../firebase';
 import { onRequest } from 'firebase-functions/v2/https';
-import { FieldValue, Receipt } from '../models';
+import { FieldValue } from '../models';
+import type { Receipt, Vendor, VendorBranch } from '../models';
 
 export const onHttpReceiptSubmit = onRequest(async (req, res) => {
   const cors = (await import('cors'))({ origin: true });
 
   cors(req, res, async () => {
     if (req.method !== 'POST') {
-      res.status(405).json({ status: 405, message: 'Method not allowed' });
+      return res.status(405).json(
+        { status: 405,
+          message: 'Method not allowed',
+        });
     }
 
     const vendorsRef = firestore.collection('vendors');
@@ -17,6 +22,26 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
 
     const apiKey = req.get('API-Key');
     const apiSecret = req.get('API-Secret');
+    const nonce = req.get('Nonce');
+    const hmacHexHeader = req.get('HMAC');
+    const subtle = webcrypto.subtle;
+
+    const currentDate = new Date();
+    const dateInMilis = currentDate.getTime();
+
+    if ( (dateInMilis - Number(nonce)) > 2000) {
+      logger.error(
+        'onHttpReceiptSubmit:HttpsError',
+        'failed-precondition',
+        'Nonce provided is invalid',
+        req.rawHeaders
+      );
+
+      return res.status(412).json({
+        status: 412,
+        message: 'Nonce provided is invalid',
+      });
+    }
 
     if (
       !apiKey ||
@@ -39,9 +64,67 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
       });
     }
 
+    if (
+      !hmacHexHeader ||
+      !nonce ||
+      typeof hmacHexHeader !== 'string' ||
+      typeof nonce !== 'string' ||
+      hmacHexHeader.length === 0 ||
+      nonce.length === 0
+    ) {
+      logger.error(
+        'onHttpReceiptSubmit:HttpsError',
+        'invalid-argument',
+        'Missing headers \'Nonce\' and \'HMAC\'',
+        req.rawHeaders
+      );
+
+      return res.status(400).json({
+        status: 400,
+        message: 'Missing headers \'Nonce\' and \'HMAC\'',
+      });
+    }
     const data = req.body;
+    const encoder = new TextEncoder();
+    const encodedApiSecret = encoder.encode(apiSecret);
+    const hmacKey = await subtle.importKey(
+      'raw',
+      encodedApiSecret,
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['verify'],
+    );
+
+    const encodedData = encoder.encode(JSON.stringify(data));
+    const signatureIntArray = Uint8Array.from(
+      Buffer.from(
+        hmacHexHeader,
+        'hex'
+      )
+    );
+    const validHmac = await subtle.verify(
+      'HMAC',
+      hmacKey,
+      signatureIntArray,
+      encodedData
+    );
+
+    if (!validHmac) {
+      logger.error(
+        'onHttpReceiptSubmit:HttpsError',
+        'invalid-argument',
+        'Cannot be trusted, invalid HMAC calculated',
+      );
+
+      return res.status(400).json({
+        status: 400,
+        message: 'Cannot be trusted, invalid HMAC calculated',
+      });
+    }
+
     const branchId = data.branchId;
-    const vendorId = data.vendor['vendorId'];
+    const vendorId = data.vendorId;
+
 
     if (
       !branchId ||
@@ -80,10 +163,34 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
         .json({ status: 400, message: 'Invalid API-Key or API-Secret' });
     }
 
-    const vendorLocation = data.branchLocation;
-    const vendorName = data.vendor.vendorName;
-    const postalCode = data.branchPostal;
+    const vendorDocRef = firestore.collection('vendors').doc(vendorId);
+    const vendorDocSnap = await vendorDocRef.get();
+    if (!vendorDocSnap.exists) {
+      logger.error(
+        'onHttpReceiptSubmit:HttpsError',
+        'forbidden',
+        'provided Vendor ID Does not exist',
+        req.rawHeaders
+      );
 
+      return res.status(403).json({
+        status: 403,
+        message: 'Forbidden',
+
+      });
+    }
+    const vendorData = vendorDocSnap.data() as Vendor;
+    const vendorBranches = vendorData.branches as VendorBranch[];
+    let vendorLocation = '';
+    let postalCode = '';
+    vendorBranches.forEach( (branch) => {
+      if (branch.branchId === branchId) {
+        vendorLocation = branch.branchLocation;
+        postalCode = branch.branchPostal;
+      }
+    });
+
+    const vendorName = vendorData.vendorName;
     const items = data.items;
     const subtotal = data.subtotal;
     const gst = data.gst;

@@ -29,7 +29,10 @@ service cloud.firestore {
             && getRequestData().updatedAt.toMillis() == request.time.toMillis();
       }
     }
-
+    match /supportTickets/{ticketId} {
+      allow create: if request.auth != null
+                    && getUserData().ticketCreatedAt < (request.time - duration.value(1,'s'));
+    }
     match /vendors/{vendorId} {
     	allow create: if true;
 
@@ -47,6 +50,7 @@ service cloud.firestore {
     match /disputes/{dispute} {
   allow create: if request.auth.uid != null && request.auth.uid == get(/databases/$(database)/documents/receipts/$(request.resource.data.receiptId)).data.userUid;
 }
+
 
     // Rules for settingPage
     match /users/{userId} {
