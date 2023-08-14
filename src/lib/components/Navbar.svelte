@@ -8,7 +8,7 @@
 </script>
 
 <nav
-  class="z-50 fixed top-0 w-full
+  class="z-50 sticky top-0 w-full
           border-b-4 border-emerald-700
           bg-gradient-to-r from-emerald-600 to-[#008080]">
   <div

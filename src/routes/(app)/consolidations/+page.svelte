@@ -125,7 +125,7 @@ $: console.log(lastDoc)
       <div class="min-w-0 flex-auto">
         <img
           class="h-12 w-12 flex-none rounded-full bg-gray-50"
-          src="fairprice logo .jpg"
+          src="x-fairprice-logo.png"
           alt="" />
         <p class="text-sm font-semibold leading-6 text-emerald-600">{vendor}</p>
       </div>
@@ -137,7 +137,7 @@ $: console.log(lastDoc)
     <div class="min-w-0 flex-auto">
       <img
         class="h-12 w-12 flex-none rounded-full bg-gray-50"
-        src="fairprice logo .jpg"
+        src="x-fairprice-logo.png"
         alt="" />
       <p class="text-sm font-semibold leading-6 text-emerald-600">FairPrice</p>
     </div>
@@ -204,7 +204,7 @@ $: console.log(lastDoc)
           <div class="flex gap-x-4">
             <img
               class="h-12 w-12 flex-none rounded-full bg-gray-50"
-              src="fairprice logo .jpg"
+              src="x-fairprice-logo.png"
               alt="" />
             <div class="min-w-0 flex-auto">
               <p class="text-sm font-semibold leading-6 text-emerald-600"
