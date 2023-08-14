@@ -77,10 +77,12 @@
   </div>
 
   <div class="bg-black">
-    <div class="px-5 py-16 mx-auto container">
-      <h3 class="text-3xl text-white text-center font-bold">
-        Receive digital receipts from hundreds of stores islandwide
-      </h3>
+    <div class="py-16 mx-auto container">
+      <div class="px-5">
+        <h3 class="text-3xl text-white text-center font-bold">
+          Receive digital receipts from hundreds of stores islandwide
+        </h3>
+      </div>
 
       <div class="p-12 grid-companies text-white">
         {#each featuredStores as store}
