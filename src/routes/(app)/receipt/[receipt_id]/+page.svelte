@@ -72,6 +72,7 @@
                 <div class='text-md font-light'>{receipt_data[0]['vendor'].vendorLocation}</div>
                 <div class='text-md font-light'>Singapore {receipt_data[0]['vendor'].postalCode}</div>
                 <div class="text-left text-lg font-bold ml-6">Receipt ID: <span>{receipt_data[0]['receiptId']}</span></div>
+                <div class="text-left text-lg font-bold ml-6">Vendor: <span>{receipt_data[0]['vendor'].vendorName}</span></div>
                 <div class=""><hr class="border-t-2 border-black border-dashed mb-2 mx-6"></div>
             </div> 
             <div class=" leading-7 grid grid-cols-6 mx-6 font-light">
