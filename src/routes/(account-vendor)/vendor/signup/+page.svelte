@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { page } from '$app/stores';
   import { LogoVendors } from '$lib/images';
   import { AniIconLoading, IconGoogle, IconMicrosoft } from '$lib/icons';
 
@@ -15,6 +16,8 @@
     handleChange,
     handleSubmit,
   } from './controller';
+
+  const searchParams = decodeURIComponent($page.url.searchParams.toString());
 </script>
 
 <svelte:head>
@@ -153,7 +156,7 @@
     <p class="text-sm">
       Already have an account?
       <a
-        href="/vendor/signin"
+        href="/vendor/signin?{searchParams}"
         class="font-medium text-emerald-600 hover:underline hover:underline-offset-2">
         Login here
       </a>
@@ -162,7 +165,7 @@
     <p class="text-sm">
       Looking for user sign up?
       <a
-        href="/account/signup"
+        href="/account/signup?{searchParams}"
         class="font-medium text-emerald-600 hover:underline hover:underline-offset-2">
         Sign up here
       </a>

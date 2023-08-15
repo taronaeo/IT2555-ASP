@@ -1,13 +1,7 @@
 <!--PAGE IS TO BE DISPLAYED IN 1180 x 820 RESOLUTION-->
 
 <script lang="ts">
-    import { goto } from '$app/navigation';
-    import { authStore } from '$lib/stores';
     import { getHttpsEndpoint } from '$lib/firebase/functions';
-
-    $:{if($authStore === null){
-        goto('/')
-    }}
     
     let editing:boolean = false;
     let selected:boolean = false;

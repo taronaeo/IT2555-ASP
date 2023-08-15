@@ -1,9 +1,8 @@
 <script>
   import './page.css';
-
-  import { goto } from '$app/navigation';
   import { assets } from '$app/paths';
-  import { signOut, continueAuth } from '$lib/firebase/auth';
+  import { authStore } from '$lib/stores';
+  import { signOut } from '$lib/firebase/auth';
 
   const featuredStores = [
     'esso',
@@ -26,6 +25,9 @@
 </svelte:head>
 
 <section>
+  <pre>{JSON.stringify($authStore, null, 2)}</pre>
+  <button on:click={signOut} class:hidden={!$authStore}>Sign Out</button>
+
   <div
     class="px-5 py-16
             mx-auto container

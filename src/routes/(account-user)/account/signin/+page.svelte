@@ -6,6 +6,7 @@
   import { Alert, SocialLogin } from '$lib/components';
   import { IconGoogle, IconMicrosoft, AniIconLoading } from '$lib/icons';
 
+  import { page } from '$app/stores';
   import { writable } from 'svelte/store';
   import { createForm } from 'svelte-forms-lib';
   import { schemaLogin, validateZod } from '$lib/forms';
@@ -17,6 +18,8 @@
     continueProvider,
     signInEmailPassword,
   } from '$lib/firebase/auth';
+
+  const searchParams = decodeURIComponent($page.url.searchParams.toString());
 
   const formState = writable<FormState>({
     isLoading: false,
@@ -176,7 +179,7 @@
 
         <div class="text-center">
           <a
-            href="/account/signup"
+            href="/account/signup?{searchParams}"
             class="font-medium text-sm text-emerald-600 hover:text-emerald-900">
             Create an account instead
           </a>
@@ -187,7 +190,7 @@
 
   <div class="mt-4 mx-auto flex flex-col space-y-1">
     <small class="text-center text-gray-500">Looking for vendor sign in?</small>
-    <a href="/vendor/signin">
+    <a href="/vendor/signin?{searchParams}">
       <LogoVendors class="w-52" />
     </a>
   </div>
