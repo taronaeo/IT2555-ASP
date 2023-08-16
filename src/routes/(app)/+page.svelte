@@ -2,7 +2,6 @@
   import './page.css';
   import { assets } from '$app/paths';
   import { authStore } from '$lib/stores';
-  import { signOut } from '$lib/firebase/auth';
 
   const featuredStores = [
     'esso',
@@ -26,7 +25,6 @@
 
 <section>
   <pre>{JSON.stringify($authStore, null, 2)}</pre>
-  <button on:click={signOut} class:hidden={!$authStore}>Sign Out</button>
 
   <div
     class="px-5 py-16
