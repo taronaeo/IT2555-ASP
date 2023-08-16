@@ -45,7 +45,7 @@ export const onReceiptDownloadCallable = onCall(async ({ auth, data }) => {
   const time = dayjs(createdAtMilis).format('hh:mm');
 
   const receipt = {
-    receiptId: receiptId,
+    receiptId: receiptData.receiptId,
     userUid: receiptData.userUid,
     vendor: receiptData.vendor,
     items: receiptData.items,
@@ -103,10 +103,10 @@ export const onReceiptDownloadCallable = onCall(async ({ auth, data }) => {
               margin-bottom: 16px;
           }
           .item-name{
-              grid-column: span 5 / span 5;
+              grid-column: span 4 / span 4;
           }
           .item-price{
-              grid-column: span 1 / span 1;
+              grid-column: span 2 / span 2;
               text-align: right;
           }
           .footer-hr{

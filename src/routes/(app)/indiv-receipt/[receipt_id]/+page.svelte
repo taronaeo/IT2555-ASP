@@ -126,8 +126,8 @@
         <div class="grid grid-cols-6 mt-12">
           <div class="grid grid-cols-6 col-span-6 mb-6">
             {#each data[0].items as item}
-              <div class="col-span-5">{item.itemName}</div>
-              <div class="col-span-1 text-right">{item.price}</div>
+              <div class="col-span-4">{item.itemName}</div>
+              <div class="col-span-2 text-right">{item.price}</div>
             {/each}
           </div>
         </div>

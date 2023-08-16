@@ -185,19 +185,51 @@
     let supportAuditDoc;
 
     if (managingNonVendor) {
-      supportAuditDoc = {
-        userId: managingVendorUserId,
-        changedAt: serverTimestamp(),
-        reasons: auditReason,
-        fieldChanged: vendorCred,
-      };
+      if (selectedChangeTrim === 'Email') {
+        supportAuditDoc = {
+          userId: managingVendorUserId,
+          changedAt: serverTimestamp(),
+          reasons: auditReason,
+          fieldChanged: 'email',
+        };
+      } else if (selectedChangeTrim === 'Phone No') {
+        supportAuditDoc = {
+          userId: managingVendorUserId,
+          changedAt: serverTimestamp(),
+          reasons: auditReason,
+          fieldChanged: 'phoneNumber',
+        };
+      } else if (selectedChangeTrim === 'Display Name') {
+        supportAuditDoc = {
+          userId: managingVendorUserId,
+          changedAt: serverTimestamp(),
+          reasons: auditReason,
+          fieldChanged: 'displayName',
+        };
+      }
     } else if (!managingNonVendor) {
-      supportAuditDoc = {
-        vendorId: managingVendorUserId,
-        changedAt: serverTimestamp(),
-        reasons: auditReason,
-        fieldChanged: vendorCred,
-      };
+      if (selectedChangeTrim === 'Email') {
+        supportAuditDoc = {
+          userId: managingVendorUserId,
+          changedAt: serverTimestamp(),
+          reasons: auditReason,
+          fieldChanged: 'vendorEmail',
+        };
+      } else if (selectedChangeTrim === 'Phone No') {
+        supportAuditDoc = {
+          userId: managingVendorUserId,
+          changedAt: serverTimestamp(),
+          reasons: auditReason,
+          fieldChanged: 'vendorPhoneNumber',
+        };
+      } else if (selectedChangeTrim === 'Display Name') {
+        supportAuditDoc = {
+          userId: managingVendorUserId,
+          changedAt: serverTimestamp(),
+          reasons: auditReason,
+          fieldChanged: 'vendorName',
+        };
+      }
     }
     batch.set(auditRef, supportAuditDoc);
 
@@ -285,14 +317,14 @@
         userId: managingVendorUserId,
         changedAt: serverTimestamp(),
         reasons: auditReason,
-        fieldChanged: vendorCred,
+        fieldChanged: 'Suspension',
       };
     } else if (!managingNonVendor) {
       supportAuditDoc = {
         vendorId: managingVendorUserId,
         changedAt: serverTimestamp(),
         reasons: auditReason,
-        fieldChanged: vendorCred,
+        fieldChanged: 'Suspension',
       };
     }
     batch.set(auditRef, supportAuditDoc);
@@ -659,17 +691,20 @@
 
   <div class:hidden={dismissed} class="flex justify-center pt-6">
     <div class="w-4/5 py-5 text-center border-2 rounded-lg font-bold leading-8">
-      <img
-        src="ig-verified-regular.svg"
-        alt="verified logo"
-        class="inline -mr-1 -mt-1" />
-      Active vendor info displayed here
-      <button
-        on:click={() => {
-          dismissed = true;
-        }}
-        class="absolute right-52 mt-2 text-blue-600 font-normal text-xs"
-        >Dismiss</button>
+      <div class="ml-8">
+        <img
+          src="ig-verified-regular.svg"
+          alt="verified logo"
+          class="inline -mr-1 -mt-1" />
+        Active vendor info displayed here
+        <button
+          on:click={() => {
+            dismissed = true;
+          }}
+          class="float-right pr-4 mt-2 text-blue-600 font-normal text-xs"
+          >Dismiss</button>
+      </div>
+
       <div class="font-normal">
         Click on the vendor or user IDs to manage their information. Only adjust
         information upon request.

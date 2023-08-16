@@ -118,7 +118,8 @@
 <div
   class:hidden={!addingItems}
   class="flex fixed justify-center items-center inset-0 w-full bg-black/50 z-10">
-  <div class="text-center text-md py-2 w-4/5 px-4 bg-white border-2">
+  <div
+    class="text-center text-md py-2 w-4/5 md:w-1/2 xl:w-1/3 px-4 bg-white border-2">
     <div class="font-bold text-lg"> Add Items </div>
     {#if !isBlank(itemAlert)}
       <div
@@ -187,7 +188,7 @@
 
 <div class="lg:grid lg:grid-cols-2">
   <div
-    class="lg:self-start py-12 px-4 border-x-2 border-b-2 border-t-4 mx-6 border-t-emerald-600 shadow-lg">
+    class="lg:self-start lg:w-3/4 xl:w-2/3 mx-auto py-12 px-4 border-x-2 border-b-2 border-t-4 border-t-emerald-600 shadow-lg">
     <div class="text-center">
       <hr class=" border-black border-[1px] border-dashed mb-6 mx-10" />
 
@@ -218,8 +219,8 @@
           <div class="col-span-6">Add Items</div>
         {/if}
         {#each items as item}
-          <div class="col-span-5">{item.itemName}</div>
-          <div class="col-span-1 text-right">{item.price}</div>
+          <div class="col-span-4">{item.itemName}</div>
+          <div class="col-span-2 text-right">{item.price}</div>
         {/each}
       </div>
     </div>
