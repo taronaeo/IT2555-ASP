@@ -3,7 +3,7 @@ import type { Vendor } from '../models';
 import * as functions from 'firebase-functions';
 import * as nodemailer from 'nodemailer';
 import { google } from 'googleapis';
-
+import * as logger from 'firebase-functions/logger';
 import { firestore } from '../firebase';
 
 export const sendMail = functions.firestore
@@ -52,10 +52,10 @@ export const sendMail = functions.firestore
 
     try {
       await transporter.sendMail(mailOptions);
-      console.log('Dispute email sent to:', vendorData.vendorEmail);
+      logger.info('Dispute email sent to:', vendorData.vendorEmail);
       return null;
     } catch (error) {
-      console.error('There was an error while sending the email:', error);
+      logger.error('There was an error while sending the email:', error);
       return null;
     }
   });

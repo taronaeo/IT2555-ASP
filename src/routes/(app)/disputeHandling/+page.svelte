@@ -1,4 +1,4 @@
-<script>
+<script lang='ts'>
   import { firestore } from '$lib/firebase';
   import {
     collection,
@@ -18,8 +18,9 @@
   } from 'firebase/storage';
   import { goto } from '$app/navigation';
   import dayjs from 'dayjs';
-  import {getHttpsCallable} from '$lib/firebase/functions'
-
+  import {getHttpsCallable} from '$lib/firebase/functions';
+  import type { Dispute } from '$lib/models/Dispute';
+  
   let receipts = [];
   let UserUid = $authStore?.uid;
   let userEmail = $authStore?.email;
@@ -189,7 +190,7 @@
       description: description,
       disputeType: disputeType,
       evidenceUrl: downloadURL,
-    };
+    } satisfies Dispute;
 
     const docRef = await addDoc(
       collection(firestore, 'disputes'),
