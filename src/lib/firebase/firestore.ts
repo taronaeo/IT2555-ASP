@@ -1,5 +1,6 @@
 import type { User, Vendor } from '$lib/models';
 import type {
+  Query,
   DocumentData,
   DocumentReference,
   CollectionReference,
@@ -42,4 +43,19 @@ export function docStore<T>(pathOrRef: string | DocumentReference) {
     _ref: ref,
     _id: ref.id,
   };
+}
+
+export function collectionStore<T>(query: Query) {
+  let unsubscribe: () => void;
+  let _firstDoc;
+  let _lastDoc;
+
+  const { subscribe } = readable<T[] | null>(undefined, (set) => {
+    unsubscribe = onSnapshot(query, (snap) =>
+      set(snap.docs.map((doc) => doc.data() as T))
+    );
+    return () => unsubscribe();
+  });
+
+  return { subscribe, _firstDoc, _lastDoc };
 }
