@@ -131,6 +131,8 @@
                 src={receipt_data[1]}
                 alt="logo" /></div>
             <div class="text-md font-light"
+              >{receipt_data[0]['vendor'].vendorName}</div>
+            <div class="text-md font-light"
               >{receipt_data[0]['vendor'].vendorLocation}</div>
             <div class="text-md font-light"
               >Singapore {receipt_data[0]['vendor'].postalCode}</div>
