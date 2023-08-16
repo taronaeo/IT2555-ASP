@@ -11,10 +11,9 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
 
   cors(req, res, async () => {
     if (req.method !== 'POST') {
-      return res.status(405).json(
-        { status: 405,
-          message: 'Method not allowed',
-        });
+      return res
+        .status(405)
+        .json({ status: 405, message: 'Method not allowed' });
     }
 
     const vendorsRef = firestore.collection('vendors');
@@ -29,7 +28,7 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
     const currentDate = new Date();
     const dateInMilis = currentDate.getTime();
 
-    if ( (dateInMilis - Number(nonce)) > 2000) {
+    if (dateInMilis - Number(nonce) > 2000) {
       logger.error(
         'onHttpReceiptSubmit:HttpsError',
         'failed-precondition',
@@ -92,15 +91,12 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
       encodedApiSecret,
       { name: 'HMAC', hash: 'SHA-256' },
       false,
-      ['verify'],
+      ['verify']
     );
 
     const encodedData = encoder.encode(JSON.stringify(data));
     const signatureIntArray = Uint8Array.from(
-      Buffer.from(
-        hmacHexHeader,
-        'hex'
-      )
+      Buffer.from(hmacHexHeader, 'hex')
     );
     const validHmac = await subtle.verify(
       'HMAC',
@@ -113,7 +109,7 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
       logger.error(
         'onHttpReceiptSubmit:HttpsError',
         'invalid-argument',
-        'Cannot be trusted, invalid HMAC calculated',
+        'Cannot be trusted, invalid HMAC calculated'
       );
 
       return res.status(400).json({
@@ -124,7 +120,6 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
 
     const branchId = data.branchId;
     const vendorId = data.vendorId;
-
 
     if (
       !branchId ||
@@ -176,14 +171,13 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
       return res.status(403).json({
         status: 403,
         message: 'Forbidden',
-
       });
     }
     const vendorData = vendorDocSnap.data() as Vendor;
     const vendorBranches = vendorData.branches as VendorBranch[];
     let vendorLocation = '';
     let postalCode = '';
-    vendorBranches.forEach( (branch) => {
+    vendorBranches.forEach((branch) => {
       if (branch.branchId === branchId) {
         vendorLocation = branch.branchLocation;
         postalCode = branch.branchPostal;

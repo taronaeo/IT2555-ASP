@@ -9,6 +9,7 @@ const callables = {
   onReceiptDownloadCallable: '',
   onManualReceiptSubmitCallable: '',
   vendorStripeDetailsCallable: '',
+  validateFileCallable: '',
 };
 
 const endpoints = {
