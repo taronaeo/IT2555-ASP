@@ -68,35 +68,6 @@
 
   }
 
-  async function listVendorsBought() {
-    try {
-        const usersReceiptsVendorsRef = doc(firestore, 'usersReceiptsVendors', userUid );
-        const docSnap = await getDoc(usersReceiptsVendorsRef);
-
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-            //@ts-ignore
-            const vendorsBoughtFrom = data.vendorsBoughtFrom;
-            const vendors = Object.keys(vendorsBoughtFrom);
-            return vendors;
-        } else {
-            console.error('Document does not exist!');
-            return [];
-        }
-    } catch (error) {
-        console.error("Error fetching vendors:", error);
-        return [];
-    }
-}
-
-  async function filterByVendor(vendorId:string){
-    selectedVendorId = vendorId;  // Set the selected vendor
-    filterType = 'vendor';
-    loadReceipts();
-  }
-
-
-
   onMount(() =>{
     loadReceipts();
   })
@@ -117,10 +88,8 @@
 
   // function to get initial set of documents
   async function loadReceipts(selectedDate?: string) {
+    console.log(selectedVendorId)
     let baseQuery: Query<DocumentData> = ref;
-    if (selectedVendorId) {
-        baseQuery = query(baseQuery, where('vendorId', '==', selectedVendorId));
-    }
     let q: Query<DocumentData> | undefined;
       switch (filterType) {
         case 'chronological':
@@ -132,13 +101,21 @@
           limit(2));
           break;
         case 'amount':
-            q = query(baseQuery,
+             q = query(baseQuery,
              where('userUid', '==', userUid),
              orderBy('total', selectedValue),
              ...(firstDoc ? [endBefore(firstDoc)] : []),
              ...(lastDoc ? [startAfter(lastDoc)] : []),
              limit(2));
             break;
+        case 'vendor':
+              q = query(baseQuery,
+              where('userUid', '==', userUid),
+              where ('vendor.vendorId', '==', selectedVendorId),
+              ...(firstDoc ? [endBefore(firstDoc)] : []),
+              ...(lastDoc ? [startAfter(lastDoc)] : []),
+             limit(2));
+             break;
         default:
             q = query(baseQuery, where('userUid', '==', userUid), orderBy('createdAt', 'desc'), ...(firstDoc ? [endBefore(firstDoc)] : []), ...(lastDoc ? [startAfter(lastDoc)] : []), limit(2));
             break;
@@ -219,27 +196,6 @@
     </ul>
   </div>
 
-
-  <div class="flex overflow-x-auto">
-    {#await listVendorsBought() }
-      <AniIconLoading fill="#059669"></AniIconLoading>
-    {:then vendors}
-    {#each vendors as vendor}
-      <button
-      on:click={()=>{filterByVendor(vendor)}}
-      class="px-4 py-2 bg-gray-200 mr-2 rounded-lg">
-        <div class="min-w-0 flex-auto">
-          <img
-            class="h-12 w-12 flex-none rounded-full bg-gray-50"
-            src="fairprice logo .jpg"
-            alt="" />
-          <p class="text-sm font-semibold leading-6 text-emerald-600">{vendor}</p>
-        </div>
-      </button>
-    {/each}
-    {/await}
-  </div>
-
   <div class="mx-auto font-bold text-2xl py-4">
     <h1>Transactions</h1>
   </div>
@@ -273,4 +229,13 @@
 
     <button class= "px-4 py-2 bg-emerald-600 text-white font-bold rounded-md focus:outline-none"on:click={paginateBack}>Previous Page</button>
     <button class="float-right py-2 px-4 bg-emerald-600 text-white font-bold rounded-md focus:outline-none" on:click={paginateNext}>Next Page</button>
+
+    <div class="flex flex-col items-center justify-center text-gray-400 pt-10">
+      <p>want to add your own receipts? click here for </p>
+      <p>
+          <a href="for dezi duck" class="underline transition hover:text-emerald-600">
+              manual receipt input
+          </a>
+      </p>
+  </div>
 
