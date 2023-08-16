@@ -23,6 +23,7 @@ service cloud.firestore {
                     && getUserData().lastActionAt < (request.time - duration.value(1,'s'));
       allow delete: if getUserData().tenantId == 'support-uxfrz';
     }
+
     match /users/{userId} {
     	allow get:	if isAuthenticated()
       						&& request.auth.uid == userId;
