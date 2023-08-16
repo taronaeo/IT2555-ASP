@@ -34,3 +34,6 @@ export * from './http/onHttpReceiptSubmit';
 export * from './callables/onVendorOnboardingCallable';
 export * from './callables/onReceiptViewCallable';
 export * from './callables/onValidateFileCallable';
+export * from './callables/vendorStripeDetailsCallable';
+export * from './callables/onManualReceiptSubmitCallable';
+export * from './callables/onReceiptDownloadCallable';

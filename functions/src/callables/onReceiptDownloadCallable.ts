@@ -103,10 +103,10 @@ export const onReceiptDownloadCallable = onCall(async ({ auth, data }) => {
               margin-bottom: 16px;
           }
           .item-name{
-              grid-column: span 4 / span 4;
+              grid-column: span 3 / span 3;
           }
           .item-price{
-              grid-column: span 2 / span 2;
+              grid-column: span 3 / span 3;
               text-align: right;
           }
           .footer-hr{

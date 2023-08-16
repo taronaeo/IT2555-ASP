@@ -107,7 +107,7 @@
     <AniIconLoading class=" my-4" fill="#059669" />
   </div>
 {:then data}
-  <div class="md:grid md:grid-cols-2">
+  <div class="md:grid md:grid-cols-2 my-4">
     <div class="flex justify-center mb-12">
       <div
         class="w-2/3 py-12 px-4 border-x-2 border-b-2 border-t-4 mx-6 border-t-emerald-600 shadow-lg">
@@ -126,8 +126,8 @@
         <div class="grid grid-cols-6 mt-12">
           <div class="grid grid-cols-6 col-span-6 mb-6">
             {#each data[0].items as item}
-              <div class="col-span-4">{item.itemName}</div>
-              <div class="col-span-2 text-right">{item.price}</div>
+              <div class="col-span-3">{item.itemName}</div>
+              <div class="col-span-3 text-right">{item.price}</div>
             {/each}
           </div>
         </div>

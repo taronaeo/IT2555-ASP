@@ -10,18 +10,8 @@
   $: {
     if ($authStore === null) {
       goto('/');
-
-  const branch_info: {
-    branchId: string;
-    vendorId: string;
-    key: string;
-    secret: string;
-  } = {
-    branchId: 'AuriFactory',
-    vendorId: 'ufBm3e2TXpr7IsTDjVUF',
-    key: '2CJV+#yc3qn5fck^',
-    secret: '|Hf9TeI1rxJRL(nR',
-  };
+    }
+  }
 
   let editing: boolean = false;
   let selected: boolean = false;
@@ -45,6 +35,18 @@
   let imgSrcBase64 = '';
 
   let generatedReceipt = '';
+
+  const branch_info: {
+    branchId: string;
+    vendorId: string;
+    key: string;
+    secret: string;
+  } = {
+    branchId: '',
+    vendorId: '',
+    key: '',
+    secret: '',
+  };
 
   const food: { itemName: string; price: number }[] = [
     { itemName: 'Aglio Olio', price: 16.5 },
@@ -1263,19 +1265,19 @@
         <div class="text-2xl font-bold">Subtotal</div>
         <input
           readonly
-          class="text-end mr-10 outline-none"
+          class="text-end mr-10 outline-none border-0"
           bind:value={subtotal_str} />
 
         <div class="text-2xl font-bold my-2">GST</div>
         <input
           readonly
-          class="text-end mr-10 outline-none"
+          class="text-end mr-10 outline-none border-0"
           bind:value={gst_str} />
 
         <div class="text-2xl font-bold">Total</div>
         <input
           readonly
-          class="text-end mr-10 outline-none"
+          class="text-end mr-10 outline-none border-0"
           bind:value={total_str} />
       </div>
     </div>

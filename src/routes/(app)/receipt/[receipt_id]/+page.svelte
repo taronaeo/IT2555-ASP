@@ -114,7 +114,7 @@
   </div>
 </div>
 <div class="px-4">
-  <div class="md:grid md:gap-8 md:grid-cols-2 md:grid-rows-3">
+  <div class="md:grid md:gap-8 md:grid-cols-2 md:grid-rows-3 my-4">
     <div class=" border-t-4 border-emerald-600 bg-slate-400">
       {#await promise}
         <div class="bg-white h-full flex items-center justify-center">

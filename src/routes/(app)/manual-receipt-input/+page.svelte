@@ -186,7 +186,7 @@
   </div>
 </div>
 
-<div class="lg:grid lg:grid-cols-2">
+<div class="lg:grid lg:grid-cols-2 m-4">
   <div
     class="lg:self-start lg:w-3/4 xl:w-2/3 mx-auto py-12 px-4 border-x-2 border-b-2 border-t-4 border-t-emerald-600 shadow-lg">
     <div class="text-center">
@@ -219,8 +219,8 @@
           <div class="col-span-6">Add Items</div>
         {/if}
         {#each items as item}
-          <div class="col-span-4">{item.itemName}</div>
-          <div class="col-span-2 text-right">{item.price}</div>
+          <div class="col-span-3">{item.itemName}</div>
+          <div class="col-span-3 text-right">{item.price}</div>
         {/each}
       </div>
     </div>
