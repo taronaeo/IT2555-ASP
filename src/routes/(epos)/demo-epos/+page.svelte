@@ -10,8 +10,6 @@
   $: {
     if ($authStore === null) {
       goto('/');
-    }
-  }
 
   const branch_info: {
     branchId: string;

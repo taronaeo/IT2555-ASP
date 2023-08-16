@@ -5,6 +5,7 @@
   import { Logo, LogoVendors } from '$lib/images';
   import { IconGoogle, IconMicrosoft, AniIconLoading } from '$lib/icons';
 
+  import { page } from '$app/stores';
   import { writable } from 'svelte/store';
   import { createForm } from 'svelte-forms-lib';
   import { Alert, SocialLogin } from '$lib/components';
@@ -18,6 +19,8 @@
     continueProvider,
     signInEmailPassword,
   } from '$lib/firebase/auth';
+
+  const searchParams = decodeURIComponent($page.url.searchParams.toString());
 
   const formState = writable<FormState>({
     isLoading: false,
@@ -177,7 +180,7 @@
 
       <div class="text-center">
         <a
-          href="/vendor/signup"
+          href="/vendor/signup?{searchParams}"
           class="font-medium text-sm text-emerald-600 hover:text-emerald-900">
           Create an account instead
         </a>
@@ -187,7 +190,7 @@
 
   <div class="flex flex-col items-center space-y-1">
     <small class="text-center text-gray-500">Looking for user sign in?</small>
-    <a href="/account/signin">
+    <a href="/account/signin?{searchParams}">
       <Logo class="h-8 md:h-10" />
     </a>
   </div>

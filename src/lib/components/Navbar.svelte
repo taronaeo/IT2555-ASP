@@ -8,31 +8,30 @@
 </script>
 
 <nav
-  class="z-50 fixed top-0 w-full
+  class="z-50 sticky top-0 w-full
           border-b-4 border-emerald-700
           bg-gradient-to-r from-emerald-600 to-[#008080]">
-  <div
-    class="h-16 mx-auto container
-              flex flex-row flex-wrap justify-start">
+  <div class="h-14 flex flex-row flex-wrap justify-start">
     <!-- Dr. Receipt Logo -->
-    <a href="/" class="px-6 py-2 h-full">
-      <Logo class="h-full" gradient_start="#fff" gradient_stop="#fff" />
+    <a href="/" class="pl-4 py-2 h-full md:px-4">
+      <Logo class="h-full" gradientStart="#fff" gradientStop="#fff" />
     </a>
 
     <div class="ml-auto flex flex-row md:order-2">
       <!-- Navbar CTA Button -->
       <a
-        href={!$authStore ? '/account/signin' : '/account/profile'}
-        class="p-4 h-full inline-flex items-center
-                text-lg text-white text-center font-medium
+        href={!$authStore ? '/account/signin' : '/dashboard/personal'}
+        class="p-4 h-14 inline-flex items-center
+                text-sm text-white text-center font-medium
                 hover:text-emerald-200 focus:outline-none">
         {!$authStore ? 'Login' : 'Profile'}
       </a>
 
       <!-- Navbar Mobile Menu Button -->
       <button
+        type="button"
         on:click={() => (isDropdownActive = !isDropdownActive)}
-        class="p-4 w-full h-full inline-flex items-center justify-center
+        class="p-4 h-14 aspect-1 inline-flex items-center justify-center
                 md:hidden focus:outline-none">
         <img
           src={!isDropdownActive ? IconMenu : IconClose}
@@ -50,16 +49,16 @@
                 md:w-auto md:order-1 md:from-transparent md:to-transparent">
       <a
         href="/"
-        class="px-6 py-2 h-full text-lg text-white font-medium
-                          md:py-5 md:text-white md:hover:bg-emerald-700">
-        Who we are
+        class="px-6 py-2 h-full text-sm text-white font-medium
+                md:py-5 md:text-white md:hover:bg-emerald-700">
+        Home
       </a>
 
       <a
         href="/"
-        class="px-6 py-2 h-full text-lg text-white font-medium
-                          md:py-5 md:text-white md:hover:bg-emerald-700">
-        Tools and services
+        class="px-6 py-2 h-full text-sm text-white font-medium
+                md:py-5 md:text-white md:hover:bg-emerald-700">
+        FAQ
       </a>
     </div>
   </div>
