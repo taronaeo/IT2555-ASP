@@ -4,7 +4,7 @@
   import { doc, updateDoc } from 'firebase/firestore';
   import { page } from '$app/stores';
   import { authStore } from '$lib/stores';
-  import { getStorage, ref, getDownloadURL, list } from 'firebase/storage';
+  import { getStorage, ref, getDownloadURL } from 'firebase/storage';
   import { AniIconLoading } from '$lib/icons';
   import dayjs from 'dayjs';
   import { getHttpsCallable } from '$lib/firebase/functions';
@@ -30,11 +30,20 @@
     );
 
     const data = receiptData.data;
+    const receiptType = data.receiptType;
+    if (receiptType === 'manual') {
+      goto(`/indiv-receipt/${current_receipt_id}`);
+    }
     const date = dayjs(data.createdAt).format('YYYY/MM/DD');
     const time = dayjs(data.createdAt).format('hh:mm');
-    const fileSnap = await getDownloadURL(
-      ref(storage, `VendorLogos/${data.vendor.vendorId}.svg`)
-    );
+    let fileSnap;
+    try {
+      fileSnap = await getDownloadURL(
+        ref(storage, `VendorLogos/${data.vendor.vendorId}.svg`)
+      );
+    } catch {
+      fileSnap = '../favicon.ico';
+    }
     if (!data.userUid) {
       assigned = false;
     }
@@ -172,8 +181,14 @@
           <div class="mx-6 grid grid-cols-6">
             <!--footer div-->
             <div class="text-center col-span-6"
-              ><span>{receipt_data[2]}</span>
-              <span>{receipt_data[3]}</span></div>
+              ><span class="mr-2">{receipt_data[2]}</span>
+              <span class="mr-1">{receipt_data[3]}</span></div>
+          </div>
+          <div class="pl-6 font-bold text-emerald-600 text-left"
+            ><img
+              src="../ig-verified-regular.svg"
+              class="inline -mt-1"
+              alt="verified icon" />Dr. Receipts Verified
           </div>
         </div>
       {/await}

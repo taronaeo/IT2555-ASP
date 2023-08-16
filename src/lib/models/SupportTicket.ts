@@ -7,4 +7,5 @@ export interface SupportTicket extends Pick<Metadata, 'createdAt'> {
   readonly inquiryType: string;
   readonly inquiryDesc: string;
   readonly createdAt: FieldValue;
+  isResolved: boolean;
 }

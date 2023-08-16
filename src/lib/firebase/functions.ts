@@ -7,6 +7,8 @@ const callables = {
   onReceiptViewCallable: '',
   onVendorOnboardingCallable: '',
   onReceiptDownloadCallable: '',
+  onManualReceiptSubmitCallable: '',
+  vendorStripeDetailsCallable: '',
 };
 
 const endpoints = {

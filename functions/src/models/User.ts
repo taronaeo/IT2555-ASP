@@ -1,5 +1,4 @@
-import type { Metadata } from '../models/Metadata';
-
+import type { Metadata, FieldValue } from '../models/Metadata';
 interface User extends Metadata {
   readonly uid: string;
   readonly tenantId: string | null;
@@ -10,6 +9,8 @@ interface User extends Metadata {
   displayName: string | null;
   photoURL: string | null;
   isOnboarded: boolean;
+  isSuspended: boolean | null;
+  lastActionAt: FieldValue;
 }
 
 export type { User };

@@ -24,10 +24,11 @@
   } else {
     userUid = $authStore.uid;
   }
-  if (!$authStore?.isOnboarded) {
-    goto('/onboarding');
+  if (!$authStore!.tenantId) {
+    goto('/');
   }
 
+  let vendorId = $authStore?.vendorId;
   let branches = [];
   let displayed_branches = [];
 
@@ -346,10 +347,6 @@
       }
     });
   }
-
-  function hasWhiteSpace(branchId) {
-    return /\s/g.test(branchId);
-  }
 </script>
 
 <div class="px-6 md:w-2/3 m-auto">
@@ -376,6 +373,8 @@
         <div class="text-center col-span-2">
           <AniIconLoading class="m-auto my-12" fill="#059669" />
         </div>
+      {:else if branches.length === 0}
+        <div> No branches created yet. </div>
       {:else}
         {#each displayed_branches as branch}
           <button
@@ -684,6 +683,19 @@
       <p class="grow">
         {alert}
       </p>
+    </div>
+    <div class="mb-6">
+      <label for="email" class="block mb-2 text-md text-gray-900"
+        >Vendor ID</label>
+      <input
+        readonly
+        bind:value={vendorId}
+        placeholder="Enter the branch id..."
+        class="p-2.5 w-full block
+                    border border-gray-300 rounded-lg
+                    bg-white text-gray-900 placeholder:text-gray-400
+                    disabled:cursor-not-allowed disabled:opacity-75"
+        required />
     </div>
     <div class="mb-6">
       <label for="email" class="block mb-2 text-md text-gray-900"

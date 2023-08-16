@@ -21,3 +21,5 @@ export * from './http/onHttpReceiptSubmit';
 export * from './callables/onVendorOnboardingCallable';
 export * from './callables/onReceiptViewCallable';
 export * from './callables/onReceiptDownloadCallable';
+export * from './callables/onManualReceiptSubmitCallable';
+export * from './callables/vendorStripeDetailsCallable';

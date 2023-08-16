@@ -31,6 +31,8 @@ export const onBeforeUserCreated = beforeUserCreated(async (event) => {
     isOnboarded: false,
     updatedAt: FieldValue.serverTimestamp(),
     createdAt: FieldValue.serverTimestamp(),
+    isSuspended: false,
+    lastActionAt: FieldValue.serverTimestamp(),
   };
 
   try {

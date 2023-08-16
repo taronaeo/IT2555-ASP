@@ -192,28 +192,46 @@ export const onHttpReceiptSubmit = onRequest(async (req, res) => {
 
     const vendorName = vendorData.vendorName;
     const items = data.items;
-    const subtotal = data.subtotal;
-    const gst = data.gst;
-    const total = data.total;
-    const change = data.change;
-    const paymentMethod = data.paymentMethod;
+    items.forEach((item: {itemName: string; price: string;}) => {
+      item['itemName'] = item['itemName'].replace(
+        /[\u00A0-\u9999<>&]/g, (i) => '&#'+i.charCodeAt(0)+';'
+      );
+      item['price'] = item['price'].replace(
+        /[\u00A0-\u9999<>&]/g, (i) => '&#'+i.charCodeAt(0)+';'
+      );
+    });
+    const subtotal = data.subtotal.replace(
+      /[\u00A0-\u9999<>&]/g, (i:string) => '&#'+i.charCodeAt(0)+';'
+    );
+    const gst = data.gst.replace(
+      /[\u00A0-\u9999<>&]/g, (i: string) => '&#'+i.charCodeAt(0)+';'
+    );
+    const total = data.total.replace(
+      /[\u00A0-\u9999<>&]/g, (i: string) => '&#'+i.charCodeAt(0)+';'
+    );
+    const change = data.change.replace(
+      /[\u00A0-\u9999<>&]/g, (i: string) => '&#'+i.charCodeAt(0)+';'
+    );
+    const paymentMethod = data.paymentMethod.replace(
+      /[\u00A0-\u9999<>&]/g, (i: string) => '&#'+i.charCodeAt(0)+';'
+    );
 
     const receiptDoc = receiptsRef.doc();
     const receiptData = {
       userUid: null,
       receiptId: receiptDoc.id,
       vendor: {
-        vendorId,
-        vendorName,
-        vendorLocation,
-        postalCode,
+        vendorId: vendorId,
+        vendorName: vendorName,
+        vendorLocation: vendorLocation,
+        postalCode: postalCode,
       },
-      items,
-      subtotal,
-      gst,
-      total,
-      change,
-      paymentMethod,
+      items: items,
+      subtotal: subtotal,
+      gst: gst,
+      total: total,
+      change: change,
+      paymentMethod: paymentMethod,
       createdAt: FieldValue.serverTimestamp(),
     } satisfies Receipt;
 
