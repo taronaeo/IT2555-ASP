@@ -75,7 +75,7 @@
       } satisfies SupportTicket);
 
       await updateDoc(userDocRef, {
-        ticketCreatedAt: serverTimestamp(),
+        lastActionAt: serverTimestamp(),
       });
     } catch (err) {
       console.error('Error occurred creating support ticket');

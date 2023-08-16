@@ -210,21 +210,21 @@
     } else if (!managingNonVendor) {
       if (selectedChangeTrim === 'Email') {
         supportAuditDoc = {
-          userId: managingVendorUserId,
+          vendorId: managingVendorUserId,
           changedAt: serverTimestamp(),
           reasons: auditReason,
           fieldChanged: 'vendorEmail',
         };
       } else if (selectedChangeTrim === 'Phone No') {
         supportAuditDoc = {
-          userId: managingVendorUserId,
+          vendorId: managingVendorUserId,
           changedAt: serverTimestamp(),
           reasons: auditReason,
           fieldChanged: 'vendorPhoneNumber',
         };
       } else if (selectedChangeTrim === 'Display Name') {
         supportAuditDoc = {
-          userId: managingVendorUserId,
+          vendorId: managingVendorUserId,
           changedAt: serverTimestamp(),
           reasons: auditReason,
           fieldChanged: 'vendorName',

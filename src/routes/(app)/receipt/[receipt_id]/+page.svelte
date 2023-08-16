@@ -1,7 +1,7 @@
 <script>
   import { firestore } from '$lib/firebase';
   import { goto } from '$app/navigation';
-  import { doc, updateDoc } from 'firebase/firestore';
+  import { doc, getDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
   import { page } from '$app/stores';
   import { authStore } from '$lib/stores';
   import { getStorage, ref, getDownloadURL } from 'firebase/storage';
@@ -66,6 +66,11 @@
     const onReceiptDownloadCallable = getHttpsCallable(
       'onReceiptDownloadCallable'
     );
+    const userRef = doc(firestore, 'users', userUid);
+    await updateDoc(userRef, {
+      lastActionAt: serverTimestamp(),
+    });
+
     try {
       const url = await getDownloadURL(pathRef);
       fetch(url, {

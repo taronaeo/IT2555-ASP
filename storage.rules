@@ -10,7 +10,8 @@ service firebase.storage {
 
       match /ReceiptPDFs/{receiptId} {
         allow read: if request.auth.uid != null
-                    && request.auth.uid == firestore.get(/databases/(default)/documents/receipts/$(receiptId.split('.pdf')[0])).data.userUid;
+                    && request.auth.uid == firestore.get(/databases/(default)/documents/receipts/$(receiptId.split('.pdf')[0])).data.userUid
+                    && firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.lastActionAt < (request.time - duration.value(1,'s'));
       }
 
       match /VendorLogos/{vendorId} {
