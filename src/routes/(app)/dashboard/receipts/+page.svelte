@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { onMount } from 'svelte';
   import { firestore } from '$lib/firebase';
   import {
     collection,
@@ -9,26 +9,13 @@
     orderBy,
     startAfter,
     endBefore,
-    doc,
-    getDoc,
     where,
   } from 'firebase/firestore';
   import dayjs from 'dayjs';
   import type { Receipt } from '$lib/models';
   import { authStore } from '$lib/stores';
-  import { AniIconLoading } from '$lib/icons';
   import type { Query, DocumentData } from 'firebase/firestore';
   import { writable } from 'svelte/store';
-  import { goto } from '$app/navigation';
-
-  if (!$authStore) {
-    goto('/account/signin');
-  }
-
-  if (!$authStore!.tenantId) {
-    goto('/consolidations');
-  }
-  console.log($authStore?.uid);
 
   let lastDoc: any;
   let receipts: Receipt[] = [];
