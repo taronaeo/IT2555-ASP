@@ -28,10 +28,10 @@
     let generatedReceipt = ""
 
     const branch_info: {branchId: string; vendorId: string; key: string; secret: string;}={
-        branchId: 'WaterwayPoint',
-        vendorId: '5qx2yI0Db3sGkSFUp6Yr',
-        key: 'k?DfkTVZDqRXUWtL',
-        secret: 'VhQ4rLv|koRf4XjD'
+        branchId: '',
+        vendorId: '',
+        key: '',
+        secret: ''
 
     }
 
