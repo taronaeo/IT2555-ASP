@@ -3,11 +3,15 @@
   import { firestore } from '$lib/firebase';
   import { collection, query, where, getDocs } from 'firebase/firestore';
   import { ref, getStorage, getDownloadURL } from 'firebase/storage';
-
+  import dayjs from 'dayjs';
+  import { AniIconLoading } from '$lib/icons';
   // Move the variable declarations above the validation logic
   let fields = { receiptID: '', Total: '' };
   let errors = { receiptID: '', Total: '' };
   let valid = false;
+  let date = ''
+  let time = ''
+
 
   // Validation function
   const validateForm = () => {
@@ -44,7 +48,7 @@ const submitHandler = async () => {
   validateForm();
   if (valid) {
     receiptId = fields.receiptID;
-    totalPrice = Number(fields.Total);
+    totalPrice = `${fields.Total}`;
     console.log('Valid form');
     const receiptsRef = collection(firestore, 'receipts');
     const q = query(
@@ -61,6 +65,8 @@ const submitHandler = async () => {
         // Assuming you only expect one document to match the query, you can access the first one
         const doc = querySnapshot.docs[0];
         receiptData = doc.data(); // Store the receipt data in the variable
+        date = dayjs(receiptData.createdAt.toMillis()).format('YYYY/MM/DD');
+        time = dayjs(receiptData.createdAt.toMillis()).format('hh:mm');
 
         const fileSnap = await getDownloadURL(
           ref(getStorage(), `VendorLogos/${receiptData.vendor.vendorId}.svg`)
@@ -156,7 +162,7 @@ const submitHandler = async () => {
       <div class="leading-7 grid grid-cols-6 mx-6 font-light">
         {#each receiptData.items as item}
           <div class="col-span-5">{item.itemName}</div>
-          <div class="col-span-1 text-right">${item.price.toFixed(2)}</div>
+          <div class="col-span-1 text-right">${item.price}</div>
         {/each}
       </div>
       <div class="">
@@ -165,36 +171,39 @@ const submitHandler = async () => {
       <div class="grid grid-cols-6">
         <div class="col-span-4 mx-6 font-semibold">SUBTOTAL</div>
         <div class="col-span-2 mx-6 text-right">
-          ${receiptData.subtotal.toFixed(2)}
+          ${receiptData.subtotal}
         </div>
 
         <div class="col-span-4 mx-6 font-semibold">
           GST <span class="font-thin">(8%)</span>
         </div>
         <div class="col-span-2 mx-6 text-right">
-          ${(receiptData.subtotal * 0.08).toFixed(2)}
+          ${(receiptData.gst)}
         </div>
 
         <div class="col-span-4 mx-6 font-semibold">TOTAL</div>
         <div class="col-span-2 mx-6 text-right">
-          ${(receiptData.total).toFixed(2)}
+          ${(receiptData.total)}
         </div>
 
         <div class="col-span-4 mx-6 font-semibold"> 
         {receiptData.paymentMethod}
         </div>
         <div class="col-span-2 mx-6 text-right">
-          ${(receiptData.total).toFixed(2)}
+          ${(receiptData.total)}
         </div>
 
         <div class="col-span-4 mx-6 font-semibold">CHANGE</div>
         <div class="col-span-2 mx-6 text-right">{receiptData.change}</div>
       </div>
+
       <div class="">
         <hr class="border-t-2 border-black border-dashed my-2 mx-6" />
       </div>
       <div class="mx-6 grid grid-cols-6">
-      </div>
+        <div class="text-center col-span-6"
+        ><span>{date}</span>
+        <span>{time}</span></div> </div>
     </div>
   {:else if valid}
   <div class="m-auto w-full bg-white p-8">

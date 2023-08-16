@@ -6,7 +6,13 @@ setGlobalOptions({
   maxInstances: 1,
   concurrency: 1000,
   region: 'asia-southeast1',
-  secrets: ['STRIPE_SECRET'],
+  secrets: [
+    'STRIPE_SECRET',
+    'GMAIL_EMAIL',
+    'GMAIL_CLIENTSECRET',
+    'GMAIL_CLIENTID',
+    'GMAIL_REFRESHTOKEN',
+  ],
   enforceAppCheck: true,
 });
 
@@ -27,3 +33,4 @@ export * from './events/onReceiptCreatedEvent';
 export * from './http/onHttpReceiptSubmit';
 export * from './callables/onVendorOnboardingCallable';
 export * from './callables/onReceiptViewCallable';
+export * from './callables/onValidateFileCallable';

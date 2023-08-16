@@ -6,17 +6,6 @@
   import { collection, query, where, getDocs, doc, getDoc, limit } from 'firebase/firestore';
   import { authStore } from '$lib/stores';
 
-  let userType = '';
-  
-  if (!$authStore) {
-    userType = 'invalid';
-  }
-  if (userType === 'invalid') {
-    goto('/account/signin');
-  } else if ($authStore && $authStore.tenantId) {
-    userType = 'vendor';
-  }
-
   function getInitials(name) {
     return name
       .split(' ')

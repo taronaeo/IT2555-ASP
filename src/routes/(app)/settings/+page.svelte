@@ -1,17 +1,28 @@
 <!-- Settings.svelte -->
 <script>
-  import { functions,firestore } from '$lib/firebase';
+  import { firestore } from '$lib/firebase';
   import {
-    collection,
-    query,
-    where,
-    getDocs,
     doc,
     setDoc,
     getDoc,
   } from 'firebase/firestore';
   import { authStore } from '$lib/stores';
-  
+  import { goto } from '$app/navigation';
+
+  let userType = '';
+
+  if (!$authStore) {
+    userType = 'invalid';
+  }
+
+  if (userType === 'invalid') {
+    goto('/account/signin');
+  } else if ($authStore && $authStore.tenantId) {
+    userType = 'vendor';
+    goto('/contact-us');
+  }
+
+
 
   let valid = false;
   let user = {};
@@ -34,6 +45,7 @@
     const phonePattern = /^[89]\d{7}$/;
     return phonePattern.test(phoneNumber);
   }
+  
 
   const validateForm = () => {
     valid = true;
@@ -90,7 +102,6 @@ async function saveSettings() {
     },
   };
 
-  console.log("Sending data to server:", newData);
 
   try {
     const response = await fetch('https://us-central1-it2555-asp.cloudfunctions.net/settingsValidationCall', {
@@ -128,10 +139,8 @@ async function saveSettings() {
 
     // If the server validation is successful, show the success modal
     isModalVisible = true;
-    console.log(result.result); // Log the server response
   } catch (error) {
     console.error('Error saving settings:', error.message);
-    // Handle the error or show an error message to the user
   }
 }
 </script>
@@ -190,7 +199,7 @@ async function saveSettings() {
           type="tel"
           id="phoneNumber"
           placeholder="Enter your phone number: "
-          maxlength="8"
+          maxlength="11"
           bind:value={user.phoneNumber}
           class="mt-1 p-2 border rounded-md w-full" />
         {#if errors.phoneNumber}

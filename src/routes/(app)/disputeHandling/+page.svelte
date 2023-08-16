@@ -14,13 +14,32 @@
     ref,
     uploadBytesResumable,
     getDownloadURL,
+    deleteObject,
   } from 'firebase/storage';
+  import { goto } from '$app/navigation';
+  import dayjs from 'dayjs';
+  import {getHttpsCallable} from '$lib/firebase/functions'
 
   let receipts = [];
   let UserUid = $authStore?.uid;
   let userEmail = $authStore?.email;
   const receiptsRef = collection(firestore, 'receipts');
   const users = collection(firestore, 'users');
+  let date = '';
+  let time = '';
+  let filename = '';
+  let userType = '';
+
+  if (!$authStore) {
+    userType = 'invalid';
+  }
+
+  if (userType === 'invalid') {
+    goto('/account/signin');
+  } else if ($authStore && $authStore.tenantId) {
+    userType = 'vendor';
+    goto('/');
+  }
 
   const q = query(receiptsRef, where('userUid', '==', UserUid));
 
@@ -41,6 +60,7 @@
   let disputeType = '';
   let description = '';
   let selectedReceipt = null;
+  let errorMessage = '';
 
   const itemsPerPage = 6;
   let currentPage = 1;
@@ -48,8 +68,15 @@
 
   function filterReceipts() {
     filteredReceipts = receipts.filter((receipt) => {
-      const receiptYear = receipt.date.substring(0, 4);
-      const receiptMonth = receipt.date.substring(5, 7);
+      // Convert createdAt timestamp to a Day.js object
+      const createdAtDate = dayjs(receipt.createdAt.toMillis());
+
+      // Format date and time for display
+      date = createdAtDate.format('YYYY/MM/DD'); // Convert createdAt to YYYY/MM/DD format
+      time = createdAtDate.format('hh:mm');
+
+      const receiptYear = date.substring(0, 4); // Use the converted date
+      const receiptMonth = date.substring(5, 7);
 
       const yearMatch = year === '' || receiptYear === year;
       const monthMatch = month === '' || receiptMonth === month;
@@ -66,12 +93,24 @@
 
   function handleFileInput(event) {
     const file = event.target.files[0];
+    filename = file.name
+    // Check the file type
+    const validFileTypes = ['image/jpeg', 'application/pdf'];
+    if (!validFileTypes.includes(file.type)) {
+        errorMessage = 'Invalid file type. Only .jpg and .pdf files are allowed.';
+        return; 
+    } else {
+        errorMessage = ''; 
+    }
+
     const reader = new FileReader();
     reader.onloadend = function () {
-      evidence = reader.result; // evidence is the data URL
+        evidence = reader.result; 
     };
-    reader.readAsDataURL(file);
-  }
+    reader.readAsArrayBuffer(file);
+}
+
+
 
   function handleDescriptionInput(event) {
     description = event.target.value;
@@ -103,55 +142,67 @@
   function closeConfirmation() {
     showConfirmation = false;
   }
-
   async function submitDispute() {
-    try {
-      const storage = getStorage();
-      const storageRef = ref(storage, 'evidence/' + selectedReceipt.receiptId);
+  try {
 
-      const uploadTask = uploadBytesResumable(storageRef, evidence);
+    const onValidateFileCallable = getHttpsCallable('validateFileCallable')
+  
+    const validationResponsePromise = onValidateFileCallable({ fileName : filename });
+    const validationResponse = await validationResponsePromise;
 
-      await new Promise((resolve, reject) => {
-        uploadTask.on(
-          'state_changed',
-          (snapshot) => {
-            // Progress function ...
-          },
-          (error) => {
-            // Handle unsuccessful uploads
-            console.log(error);
-            reject(error);
-          },
-          () => {
-            // Handle successful uploads on complete
-            console.log('Upload is done!');
-            resolve();
-          }
-        );
-      });
+    const validationData = validationResponse.data 
 
-      const downloadURL = await getDownloadURL(storageRef);
-
-      const disputeData = {
-        vendorEmail: selectedReceipt.vendor.email,
-        userEmail: userEmail,
-        receiptId: selectedReceipt.receiptId,
-        description: description,
-        disputeType: disputeType,
-        evidenceUrl: downloadURL,
-      };
-
-      const docRef = await addDoc(
-        collection(firestore, 'disputes'),
-        disputeData
-      );
-
-      console.log('Dispute submitted with ID: ', docRef.id);
-      closeConfirmation();
-    } catch (e) {
-      console.error('Error adding document: ', e);
+    if (!validationData) {
+      throw new Error('Invalid file type. Only .jpg and .pdf files are allowed.');
     }
+
+    const storage = getStorage();
+    const storageRef = ref(storage, 'evidence/' + selectedReceipt.receiptId);
+
+    const uploadTask = uploadBytesResumable(storageRef, evidence);
+
+    await new Promise((resolve, reject) => {
+      uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+        },
+        (error) => {
+          // Handle unsuccessful uploads
+          console.log(error);
+          reject(error);
+        },
+        () => {
+          // Handle successful uploads on complete
+          console.log('Upload is done!');
+          resolve();
+        }
+      );
+    });
+
+    const downloadURL = await getDownloadURL(storageRef);
+
+
+    const disputeData = {
+      vendorId: selectedReceipt.vendor.vendorId,
+      userEmail: userEmail,
+      receiptId: selectedReceipt.receiptId,
+      description: description,
+      disputeType: disputeType,
+      evidenceUrl: downloadURL,
+    };
+
+    const docRef = await addDoc(
+      collection(firestore, 'disputes'),
+      disputeData
+    );
+
+    console.log('Dispute submitted with ID: ', docRef.id);
+    closeConfirmation();
+  } catch (e) {
+    console.error('Error:', e);
+    errorMessage = e.message || 'An error occurred while submitting the dispute.';
   }
+}
 
   onMount(() => {
     closeConfirmation();
@@ -161,6 +212,7 @@
 <svelte:head>
   <title>disputeHandling</title>
 </svelte:head>
+
 
 {#if showConfirmation}
   <div
@@ -247,8 +299,8 @@
         class:bg-blue-200={selectedReceipt === receipt}
         on:click={() => (selectedReceipt = receipt)}>
         <div class="text-lg font-medium mb-2">{receipt.vendor.vendorName}</div>
-        <div class="text-sm text-gray-500 mb-1">Date: {receipt.date}</div>
-        <div class="text-sm text-gray-500 mb-1">Time: {receipt.time}</div>
+        <div class="text-sm text-gray-500 mb-1">Date: {date}</div>
+        <div class="text-sm text-gray-500 mb-1">Time: {time}</div>
         <div class="text-sm text-gray-500">Total Cost: ${receipt.subtotal}</div>
       </div>
     {/each}
@@ -333,9 +385,13 @@
       class="block"
       accept="image/*, .pdf"
       on:change={handleFileInput} />
+      {#if errorMessage} 
+        <p class="text-red-500 mt-2">{errorMessage}</p>
+    {/if}
   </div>
 
   <div>
+    {#if !errorMessage}
     <button
       type="button"
       class="px-4 py-2 bg-green-500 text-white rounded hover:bg-emerald-600"
@@ -343,5 +399,6 @@
       on:click={openConfirmation}>
       Submit Dispute
     </button>
+    {/if}
   </div>
 </div>
