@@ -1,9 +1,10 @@
-import type { User as UserDoc, Vendor } from '$lib/models';
+import type { Readable } from 'svelte/store';
 import type { User as AuthUser } from 'firebase/auth';
+import type { User as UserDoc, Vendor } from '$lib/models';
 
 import { doc } from 'firebase/firestore';
+import { derived, readable } from 'svelte/store';
 import { onAuthStateChanged } from 'firebase/auth';
-import { derived, readable, type Readable } from 'svelte/store';
 
 import { auth } from '$lib/firebase';
 import { colUsers, colVendors, docStore } from '$lib/firebase/firestore';

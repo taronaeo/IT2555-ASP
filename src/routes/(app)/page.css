@@ -1,0 +1,21 @@
+.grid-companies {
+  @apply grid justify-between place-items-center;
+  grid-template-columns: repeat(3, 64px);
+  row-gap: 24px;
+}
+
+@media screen(md) {
+  .grid-companies {
+    @apply grid justify-between place-items-center;
+    grid-template-columns: repeat(4, 64px);
+    row-gap: 48px;
+  }
+}
+
+@media screen(lg) {
+  .grid-companies {
+    @apply grid justify-between place-items-center;
+    grid-template-columns: repeat(6, 64px);
+    row-gap: 48px;
+  }
+}

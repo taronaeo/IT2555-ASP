@@ -11,6 +11,7 @@
     AniIconLoading,
   } from '$lib/icons';
 
+  import { page } from '$app/stores';
   import { writable } from 'svelte/store';
   import { createForm } from 'svelte-forms-lib';
   import { schemaRegister, validateZod } from '$lib/forms';
@@ -22,6 +23,8 @@
     continueProvider,
     signUpEmailPassword,
   } from '$lib/firebase/auth';
+
+  const searchParams = decodeURIComponent($page.url.searchParams.toString());
 
   const benefits = [
     [
@@ -261,7 +264,7 @@
 
             <div class="text-center">
               <a
-                href="/account/signin"
+                href="/account/signin?{searchParams}"
                 class="font-medium text-sm text-emerald-600 hover:text-emerald-900">
                 Have an account already? Sign in instead
               </a>
@@ -274,8 +277,7 @@
 
   <div class="mx-auto flex flex-col space-y-1">
     <small class="text-center text-gray-500">Looking for other sign ups?</small>
-    <a href="/vendor/signup">
-      <!-- TODO: Replace with LogoForVendors -->
+    <a href="/vendor/signup?{searchParams}">
       <LogoVendors class="w-52" />
     </a>
   </div>
