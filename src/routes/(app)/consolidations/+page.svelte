@@ -68,35 +68,6 @@
 
   }
 
-  async function listVendorsBought() {
-    try {
-        const usersReceiptsVendorsRef = doc(firestore, 'usersReceiptsVendors', userUid );
-        const docSnap = await getDoc(usersReceiptsVendorsRef);
-
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-            //@ts-ignore
-            const vendorsBoughtFrom = data.vendorsBoughtFrom;
-            const vendors = Object.keys(vendorsBoughtFrom);
-            return vendors;
-        } else {
-            console.error('Document does not exist!');
-            return [];
-        }
-    } catch (error) {
-        console.error("Error fetching vendors:", error);
-        return [];
-    }
-}
-
-  async function filterByVendor(vendorId:string){
-    selectedVendorId = vendorId;
-    filterType = 'vendor';
-    loadReceipts();
-  }
-
-
-
   onMount(() =>{
     loadReceipts();
   })
@@ -223,27 +194,6 @@
         {/if}
       </li>
     </ul>
-  </div>
-
-
-  <div class="flex overflow-x-auto">
-    {#await listVendorsBought() }
-      <AniIconLoading fill="#059669"></AniIconLoading>
-    {:then vendors}
-    {#each vendors as vendor}
-      <button
-      on:click={()=>{filterByVendor(vendor)}}
-      class="px-4 py-2 bg-gray-200 mr-2 rounded-lg">
-        <div class="min-w-0 flex-auto">
-          <img
-            class="h-12 w-12 flex-none rounded-full bg-gray-50"
-            src="fairprice logo .jpg"
-            alt="" />
-          <p class="text-sm font-semibold leading-6 text-emerald-600">{vendor}</p>
-        </div>
-      </button>
-    {/each}
-    {/await}
   </div>
 
   <div class="mx-auto font-bold text-2xl py-4">
