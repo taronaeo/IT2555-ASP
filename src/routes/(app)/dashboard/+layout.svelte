@@ -72,16 +72,6 @@
                   </a>
                 </li>
               {/if}
-
-              <li class="mb-1">
-                <a
-                  href="/settings"
-                  class="text-lg hover:text-emerald-600"
-                  class:font-bold={currentPage?.match(/payment/g)}
-                  class:text-emerald-600={currentPage?.match(/payment/g)}>
-                  Settings
-                </a>
-              </li>
             </ul>
           </div>
 
