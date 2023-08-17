@@ -62,7 +62,7 @@
                   </a>
                 </li>
 
-                <li class="mb-1">
+                <!-- <li class="mb-1">
                   <a
                     href="/dashboard/payment"
                     class="text-lg hover:text-emerald-600"
@@ -70,7 +70,7 @@
                     class:text-emerald-600={currentPage?.match(/payment/g)}>
                     Payment Methods
                   </a>
-                </li>
+                </li> -->
               {/if}
             </ul>
           </div>

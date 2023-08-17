@@ -55,10 +55,31 @@
       </a>
 
       <a
-        href="/"
+        href="/dashboard/receipts"
         class="px-6 py-2 h-full text-sm text-white font-medium
                 md:py-5 md:text-white md:hover:bg-emerald-700">
-        FAQ
+        Consolidations
+      </a>
+
+      <a
+        href="/disputeHandling"
+        class="px-6 py-2 h-full text-sm text-white font-medium
+                md:py-5 md:text-white md:hover:bg-emerald-700">
+        Dispute Handling
+      </a>
+
+      <a
+        href="/contact-us"
+        class="px-6 py-2 h-full text-sm text-white font-medium
+                md:py-5 md:text-white md:hover:bg-emerald-700">
+        Contact Us
+      </a>
+
+      <a
+        href="/receiptVerification"
+        class="px-6 py-2 h-full text-sm text-white font-medium
+                md:py-5 md:text-white md:hover:bg-emerald-700">
+        Receipt Verification
       </a>
     </div>
   </div>
