@@ -6,7 +6,7 @@
 	"scripts": {
 		"dev": "npm-run-all -p dev:web dev:firebase dev:functions",
 		"dev:web": "vite dev",
-		"dev:firebase": "firebase emulators:start --only auth,functions,firestore,pubsub,storage,eventarc",
+		"dev:firebase": "firebase emulators:start --only auth,functions,firestore,pubsub,storage,eventarc,extensions",
 		"dev:functions": "yarn --cwd functions build:watch",
 		"build": "vite build",
 		"preview": "vite preview",

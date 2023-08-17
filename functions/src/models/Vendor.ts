@@ -13,6 +13,8 @@ export interface Vendor {
   stripeStatus: string;
   stripeItemId: string;
 
+  isSuspended: boolean;
+
   branches: VendorBranch[] | null;
   apiKeys: VendorApiKey[] | null;
   branchCreatedAt: FieldValue;

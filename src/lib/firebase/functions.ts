@@ -6,6 +6,9 @@ const callables = {
   onOnboardingCallable: '',
   onReceiptViewCallable: '',
   onVendorOnboardingCallable: '',
+  onReceiptDownloadCallable: '',
+  onManualReceiptSubmitCallable: '',
+  vendorStripeDetailsCallable: '',
   validateFileCallable: '',
 };
 

@@ -20,4 +20,5 @@ export interface Receipt extends Pick<Metadata, 'createdAt'> {
   readonly total: number;
   readonly paymentMethod: string;
   readonly change: number;
+  readonly receiptType?: string | null;
 }

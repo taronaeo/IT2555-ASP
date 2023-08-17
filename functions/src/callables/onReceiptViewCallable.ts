@@ -26,8 +26,9 @@ export const onReceiptViewCallable = onCall(async ({ auth, data }) => {
     throw new HttpsError('not-found', 'Data requested does not exist');
   }
   const receiptData = receiptSnap.data() as Receipt;
+
   const receipt: Receipt = {
-    receiptId: receiptId,
+    receiptId: receiptData.receiptId,
     userUid: receiptData.userUid,
     vendor: receiptData.vendor,
     items: receiptData.items,
@@ -39,6 +40,7 @@ export const onReceiptViewCallable = onCall(async ({ auth, data }) => {
     createdAt: receiptData.createdAt.toMillis(),
     paymentMethod: receiptData.paymentMethod,
     change: receiptData.change,
+    receiptType: receiptData.receiptType,
   };
 
   const receiptUserUid = receiptData.userUid;

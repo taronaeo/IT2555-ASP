@@ -153,6 +153,7 @@ export const onVendorOnboardingCallable = onCall(
       branches: [],
       apiKeys: [],
       branchCreatedAt: FieldValue.serverTimestamp(),
+      isSuspended: false,
     };
 
     const updatedUserData = {
