@@ -151,7 +151,7 @@
   </div>
 {/if}
 
-<main class="min-h-screen flex justify-center items-center p-4">
+<main class="flex items-center p-4">
   <div class="w-full max-w-xl bg-white rounded-lg shadow-md">
     <h1 class="text-2xl font-semibold text-center pt-6"
       >Personal Information</h1>

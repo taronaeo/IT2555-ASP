@@ -1,4 +1,4 @@
-<script lang='ts'>
+<script lang="ts">
   import { firestore } from '$lib/firebase';
   import {
     collection,
@@ -18,9 +18,9 @@
   } from 'firebase/storage';
   import { goto } from '$app/navigation';
   import dayjs from 'dayjs';
-  import {getHttpsCallable} from '$lib/firebase/functions';
+  import { getHttpsCallable } from '$lib/firebase/functions';
   import type { Dispute } from '$lib/models/Dispute';
-  
+
   let receipts = [];
   let UserUid = $authStore?.uid;
   let userEmail = $authStore?.email;
@@ -36,7 +36,7 @@
   }
 
   if (userType === 'invalid') {
-    goto('/account/signin');
+    goto('/');
   } else if ($authStore && $authStore.tenantId) {
     userType = 'vendor';
     goto('/');
@@ -94,24 +94,22 @@
 
   function handleFileInput(event) {
     const file = event.target.files[0];
-    filename = file.name
+    filename = file.name;
     // Check the file type
     const validFileTypes = ['image/jpeg', 'application/pdf'];
     if (!validFileTypes.includes(file.type)) {
-        errorMessage = 'Invalid file type. Only .jpg and .pdf files are allowed.';
-        return; 
+      errorMessage = 'Invalid file type. Only .jpg and .pdf files are allowed.';
+      return;
     } else {
-        errorMessage = ''; 
+      errorMessage = '';
     }
 
     const reader = new FileReader();
     reader.onloadend = function () {
-        evidence = reader.result; 
+      evidence = reader.result;
     };
     reader.readAsArrayBuffer(file);
-}
-
-
+  }
 
   function handleDescriptionInput(event) {
     description = event.target.value;
@@ -144,66 +142,68 @@
     showConfirmation = false;
   }
   async function submitDispute() {
-  try {
+    try {
+      const onValidateFileCallable = getHttpsCallable('validateFileCallable');
 
-    const onValidateFileCallable = getHttpsCallable('validateFileCallable')
-  
-    const validationResponsePromise = onValidateFileCallable({ fileName : filename });
-    const validationResponse = await validationResponsePromise;
+      const validationResponsePromise = onValidateFileCallable({
+        fileName: filename,
+      });
+      const validationResponse = await validationResponsePromise;
 
-    const validationData = validationResponse.data 
+      const validationData = validationResponse.data;
 
-    if (!validationData) {
-      throw new Error('Invalid file type. Only .jpg and .pdf files are allowed.');
-    }
+      if (!validationData) {
+        throw new Error(
+          'Invalid file type. Only .jpg and .pdf files are allowed.'
+        );
+      }
 
-    const storage = getStorage();
-    const storageRef = ref(storage, 'evidence/' + selectedReceipt.receiptId);
+      const storage = getStorage();
+      const storageRef = ref(storage, 'evidence/' + selectedReceipt.receiptId);
 
-    const uploadTask = uploadBytesResumable(storageRef, evidence);
+      const uploadTask = uploadBytesResumable(storageRef, evidence);
 
-    await new Promise((resolve, reject) => {
-      uploadTask.on(
-        'state_changed',
-        (snapshot) => {
-        },
-        (error) => {
-          // Handle unsuccessful uploads
-          console.log(error);
-          reject(error);
-        },
-        () => {
-          // Handle successful uploads on complete
-          console.log('Upload is done!');
-          resolve();
-        }
+      await new Promise((resolve, reject) => {
+        uploadTask.on(
+          'state_changed',
+          (snapshot) => {},
+          (error) => {
+            // Handle unsuccessful uploads
+            console.log(error);
+            reject(error);
+          },
+          () => {
+            // Handle successful uploads on complete
+            console.log('Upload is done!');
+            resolve();
+          }
+        );
+      });
+
+      const downloadURL = await getDownloadURL(storageRef);
+
+      const disputeData = {
+        vendorId: selectedReceipt.vendor.vendorId,
+        userEmail: userEmail,
+        receiptId: selectedReceipt.receiptId,
+        description: description,
+        disputeType: disputeType,
+        evidenceUrl: downloadURL,
+      } satisfies Dispute;
+
+      const docRef = await addDoc(
+        collection(firestore, 'disputes'),
+        disputeData
       );
-    });
 
-    const downloadURL = await getDownloadURL(storageRef);
-
-
-    const disputeData = {
-      vendorId: selectedReceipt.vendor.vendorId,
-      userEmail: userEmail,
-      receiptId: selectedReceipt.receiptId,
-      description: description,
-      disputeType: disputeType,
-      evidenceUrl: downloadURL,
-    } satisfies Dispute;
-
-    const docRef = await addDoc(
-      collection(firestore, 'disputes'),
-      disputeData
-    );
-
-    console.log('Dispute submitted with ID: ', docRef.id);
-    closeConfirmation();
-  } catch (e) {
-    console.error('Error:', e);
-    errorMessage = e.message || 'An error occurred while submitting the dispute.';
+      console.log('Dispute submitted with ID: ', docRef.id);
+      closeConfirmation();
+    } catch (e) {
+      console.error('Error:', e);
+      errorMessage =
+        e.message || 'An error occurred while submitting the dispute.';
+    }
   }
-}
 
   onMount(() => {
     closeConfirmation();
@@ -213,7 +213,6 @@
 <svelte:head>
   <title>disputeHandling</title>
 </svelte:head>
-
 
 {#if showConfirmation}
   <div
@@ -386,20 +385,20 @@
       class="block"
       accept="image/*, .pdf"
       on:change={handleFileInput} />
-      {#if errorMessage} 
-        <p class="text-red-500 mt-2">{errorMessage}</p>
+    {#if errorMessage}
+      <p class="text-red-500 mt-2">{errorMessage}</p>
     {/if}
   </div>
 
   <div>
     {#if !errorMessage}
-    <button
-      type="button"
-      class="px-4 py-2 bg-green-500 text-white rounded hover:bg-emerald-600"
-      disabled={!selectedReceipt || !disputeType || !description || !evidence}
-      on:click={openConfirmation}>
-      Submit Dispute
-    </button>
+      <button
+        type="button"
+        class="px-4 py-2 bg-green-500 text-white rounded hover:bg-emerald-600"
+        disabled={!selectedReceipt || !disputeType || !description || !evidence}
+        on:click={openConfirmation}>
+        Submit Dispute
+      </button>
     {/if}
   </div>
 </div>

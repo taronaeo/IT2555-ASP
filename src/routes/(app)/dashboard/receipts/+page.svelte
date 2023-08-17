@@ -264,7 +264,9 @@
 <div class="flex flex-col items-center justify-center text-gray-400 pt-10">
   <p>want to add your own receipts? click here for </p>
   <p>
-    <a href="for dezi duck" class="underline transition hover:text-emerald-600">
+    <a
+      href="/manual-receipt-input"
+      class="underline transition hover:text-emerald-600">
       manual receipt input
     </a>
   </p>
