@@ -20,7 +20,7 @@
     <div class="ml-auto flex flex-row md:order-2">
       <!-- Navbar CTA Button -->
       <a
-        href={!$authStore ? '/account/signin' : '/dashboard/personal'}
+        href={!$authStore ? '/account/signin' : '/dashboard'}
         class="p-4 h-14 inline-flex items-center
                 text-sm text-white text-center font-medium
                 hover:text-emerald-200 focus:outline-none">

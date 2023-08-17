@@ -2,7 +2,7 @@
   import { AuthGuard } from '$lib/components';
 
   import { page } from '$app/stores';
-  import { authStore } from '$lib/stores';
+  import { authStore, vendorStore } from '$lib/stores';
   import { signOut } from '$lib/firebase/auth';
 
   $: currentPage = $page.route.id?.split('/').pop();
@@ -51,25 +51,27 @@
                 </a>
               </li>
 
-              <li class="mb-1">
-                <a
-                  href="/dashboard/branches"
-                  class="text-lg hover:text-emerald-600"
-                  class:font-bold={currentPage?.match(/branches/g)}
-                  class:text-emerald-600={currentPage?.match(/branches/g)}>
-                  Branches
-                </a>
-              </li>
+              {#if $vendorStore}
+                <li class="mb-1">
+                  <a
+                    href="/dashboard/branches"
+                    class="text-lg hover:text-emerald-600"
+                    class:font-bold={currentPage?.match(/branches/g)}
+                    class:text-emerald-600={currentPage?.match(/branches/g)}>
+                    Branches
+                  </a>
+                </li>
 
-              <li class="mb-1">
-                <a
-                  href="/dashboard/payment"
-                  class="text-lg hover:text-emerald-600"
-                  class:font-bold={currentPage?.match(/payment/g)}
-                  class:text-emerald-600={currentPage?.match(/payment/g)}>
-                  Payment Methods
-                </a>
-              </li>
+                <li class="mb-1">
+                  <a
+                    href="/dashboard/payment"
+                    class="text-lg hover:text-emerald-600"
+                    class:font-bold={currentPage?.match(/payment/g)}
+                    class:text-emerald-600={currentPage?.match(/payment/g)}>
+                    Payment Methods
+                  </a>
+                </li>
+              {/if}
             </ul>
           </div>
 

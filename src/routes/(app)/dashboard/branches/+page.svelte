@@ -7,6 +7,11 @@
   import { firestore } from '$lib/firebase';
   import { doc, setDoc, arrayRemove, arrayUnion } from 'firebase/firestore';
 
+  import { goto } from '$app/navigation';
+  import { browser } from '$app/environment';
+  import { authStore } from '$lib/stores';
+  import { AuthTenant } from '$lib/constants';
+
   import { z } from 'zod';
   import { createForm } from 'svelte-forms-lib';
   import { validateZod } from '$lib/forms';
@@ -17,6 +22,12 @@
   let selectedBranchAPIShow: VendorApiKey = {} as VendorApiKey;
 
   $: branches = $vendorStore?.branches || [];
+  $: (async () => {
+    if (browser && !$authStore) return;
+    if (browser && $authStore && $authStore.tenantId !== AuthTenant.VENDOR) {
+      return await goto('/dashboard', { replaceState: true });
+    }
+  })();
 
   const onAPIShowCancel = () => (selectedBranchAPIShow = {} as VendorApiKey);
   const onDeleteCancel = () => (selectedBranchDelete = {} as VendorBranch);
@@ -278,64 +289,66 @@
   </Modal>
 {/if}
 
-<div class="mb-10">
-  <h1 class="text-3xl font-bold">Branches</h1>
-  <p class="text-sm">Manage branches and respective API keys</p>
-</div>
+{#if $authStore && $authStore.tenantId === AuthTenant.VENDOR}
+  <div class="mb-10">
+    <h1 class="text-3xl font-bold">Branches</h1>
+    <p class="text-sm">Manage branches and respective API keys</p>
+  </div>
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-  {#each branches as branch}
-    <div
-      class="shadow-lg rounded-lg
-              border border-gray-200 overflow-hidden">
-      <div class="p-6">
-        <h3 class="leading-6 font-semibold">
-          {branch.branchId}
-        </h3>
-
-        <div class="mt-2">
-          <p class="text-sm text-gray-500">
-            {branch.branchLocation} ∙ S({branch.branchPostal})
-          </p>
-        </div>
-      </div>
-
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    {#each branches as branch}
       <div
-        class="p-4 bg-gray-50
+        class="shadow-lg rounded-lg
+              border border-gray-200 overflow-hidden">
+        <div class="p-6">
+          <h3 class="leading-6 font-semibold">
+            {branch.branchId}
+          </h3>
+
+          <div class="mt-2">
+            <p class="text-sm text-gray-500">
+              {branch.branchLocation} ∙ S({branch.branchPostal})
+            </p>
+          </div>
+        </div>
+
+        <div
+          class="p-4 bg-gray-50
                 sm:flex sm:flex-row-reverse">
-        <button
-          on:click={() => onDeleteClick(branch.branchId)}
-          type="button"
-          class="px-3 py-2 w-full shadow-sm rounded-md
+          <button
+            on:click={() => onDeleteClick(branch.branchId)}
+            type="button"
+            class="px-3 py-2 w-full shadow-sm rounded-md
                   text-sm text-white font-semibold bg-red-600 hover:bg-red-500
                   inline-flex justify-center sm:ml-3 sm:w-auto">
-          Delete
-        </button>
+            Delete
+          </button>
 
-        <button
-          on:click={() => onAPIShowClick(branch.branchId)}
-          type="button"
-          class="mt-3 px-3 py-2 w-full shadow-sm rounded-md
+          <button
+            on:click={() => onAPIShowClick(branch.branchId)}
+            type="button"
+            class="mt-3 px-3 py-2 w-full shadow-sm rounded-md
                   text-sm font-semibold bg-white hover:bg-gray-50
                   ring-1 ring-inset ring-gray-300
                   inline-flex justify-center sm:mt-0 sm:w-auto">
-          Show API Key
-        </button>
+            Show API Key
+          </button>
+        </div>
       </div>
-    </div>
-  {/each}
+    {/each}
 
-  <button
-    on:click={toggleShowAddBranch}
-    class="text-left shadow-lg rounded-lg
+    <button
+      on:click={toggleShowAddBranch}
+      class="text-left shadow-lg rounded-lg
             border-2 border-gray-200 border-dashed overflow-hidden
             hover:bg-gray-50 transition-colors">
-    <div class="p-6">
-      <h3 class="leading-6 font-semibold">Add new branch</h3>
+      <div class="p-6">
+        <h3 class="leading-6 font-semibold">Add new branch</h3>
 
-      <div class="mt-2">
-        <p class="text-sm text-gray-500">Click to add a new branch</p>
+        <div class="mt-2">
+          <p class="text-sm text-gray-500">Click to add a new branch</p>
+        </div>
       </div>
-    </div>
-  </button>
-</div>
+    </button>
+  </div>
+{/if}
