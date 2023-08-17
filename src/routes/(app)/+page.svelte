@@ -1,7 +1,6 @@
 <script>
   import './page.css';
   import { assets } from '$app/paths';
-  import { authStore } from '$lib/stores';
 
   const featuredStores = [
     'esso',
@@ -24,8 +23,6 @@
 </svelte:head>
 
 <section>
-  <pre>{JSON.stringify($authStore, null, 2)}</pre>
-
   <div
     class="px-5 py-16
             mx-auto container
