@@ -96,7 +96,7 @@
           orderBy('createdAt', selectedValue),
           ...(firstDoc ? [endBefore(firstDoc)] : []),
           ...(lastDoc ? [startAfter(lastDoc)] : []),
-          limit(2)
+          limit(5)
         );
         break;
       case 'amount':
@@ -106,7 +106,7 @@
           orderBy('total', selectedValue),
           ...(firstDoc ? [endBefore(firstDoc)] : []),
           ...(lastDoc ? [startAfter(lastDoc)] : []),
-          limit(2)
+          limit(5)
         );
         break;
       case 'vendor':
@@ -116,7 +116,7 @@
           where('vendor.vendorId', '==', selectedVendorId),
           ...(firstDoc ? [endBefore(firstDoc)] : []),
           ...(lastDoc ? [startAfter(lastDoc)] : []),
-          limit(2)
+          limit(5)
         );
         break;
       default:
@@ -126,7 +126,7 @@
           orderBy('createdAt', 'desc'),
           ...(firstDoc ? [endBefore(firstDoc)] : []),
           ...(lastDoc ? [startAfter(lastDoc)] : []),
-          limit(2)
+          limit(5)
         );
         break;
     }
@@ -226,14 +226,14 @@
 
 <ul>
   {#each receipts as receipt}
-    <a href={`receipt/${receipt.receiptId}`}>
+    <a href={`/receipt/${receipt.receiptId}`}>
       <div class="container mx-auto font-thin text-">
         {dateConversion(receipt)}
         <li class="flex justify-between gap-x-6 py-5">
           <div class="flex gap-x-4">
             <img
               class="h-12 w-12 flex-none rounded-full bg-gray-50"
-              src="fairprice logo .jpg"
+              src="../favicon.ico"
               alt="" />
             <div class="min-w-0 flex-auto">
               <p class="text-sm font-semibold leading-6 text-emerald-600"

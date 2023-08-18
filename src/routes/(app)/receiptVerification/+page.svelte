@@ -9,9 +9,8 @@
   let fields = { receiptID: '', Total: '' };
   let errors = { receiptID: '', Total: '' };
   let valid = false;
-  let date = ''
-  let time = ''
-
+  let date = '';
+  let time = '';
 
   // Validation function
   const validateForm = () => {
@@ -43,49 +42,48 @@
   let receiptData = null;
   let logoSrc = '';
 
-  
-const submitHandler = async () => {
-  validateForm();
-  if (valid) {
-    receiptId = fields.receiptID;
-    totalPrice = `${fields.Total}`;
-    console.log('Valid form');
-    const receiptsRef = collection(firestore, 'receipts');
-    const q = query(
-      receiptsRef,
-      where('receiptId', '==', receiptId),
-      where('total', '==', totalPrice)
-    );
+  const submitHandler = async () => {
+    validateForm();
+    if (valid) {
+      receiptId = fields.receiptID;
+      totalPrice = `${fields.Total}`;
+      console.log('Valid form');
+      const receiptsRef = collection(firestore, 'receipts');
+      const q = query(
+        receiptsRef,
+        where('receiptId', '==', receiptId),
+        where('total', '==', totalPrice)
+      );
 
-    try {
-      const querySnapshot = await getDocs(q);
+      try {
+        const querySnapshot = await getDocs(q);
 
-      // Check if there are any documents returned
-      if (querySnapshot.size > 0) {
-        // Assuming you only expect one document to match the query, you can access the first one
-        const doc = querySnapshot.docs[0];
-        receiptData = doc.data(); // Store the receipt data in the variable
-        date = dayjs(receiptData.createdAt.toMillis()).format('YYYY/MM/DD');
-        time = dayjs(receiptData.createdAt.toMillis()).format('hh:mm');
+        // Check if there are any documents returned
+        if (querySnapshot.size > 0) {
+          // Assuming you only expect one document to match the query, you can access the first one
+          const doc = querySnapshot.docs[0];
+          receiptData = doc.data(); // Store the receipt data in the variable
+          date = dayjs(receiptData.createdAt.toMillis()).format('YYYY/MM/DD');
+          time = dayjs(receiptData.createdAt.toMillis()).format('hh:mm');
 
-        const fileSnap = await getDownloadURL(
-          ref(getStorage(), `VendorLogos/${receiptData.vendor.vendorId}.svg`)
-        );
-        logoSrc = fileSnap;
-      } else {
-        console.log('No matching receipt found.');
-        // Handle the case where no receipt is found
+          const fileSnap = await getDownloadURL(
+            ref(getStorage(), `VendorLogos/${receiptData.vendor.vendorId}.svg`)
+          );
+          logoSrc = fileSnap;
+        } else {
+          console.log('No matching receipt found.');
+          // Handle the case where no receipt is found
+          // For example, you can show an error message to the user
+        }
+      } catch (error) {
+        console.error('Error fetching receipt:', error);
+        // Handle any errors that may occur during fetching
         // For example, you can show an error message to the user
       }
-    } catch (error) {
-      console.error('Error fetching receipt:', error);
-      // Handle any errors that may occur during fetching
-      // For example, you can show an error message to the user
+    } else {
+      console.log('Invalid form');
     }
-  } else {
-    console.log('Invalid form');
-  }
-};
+  };
 </script>
 
 <svelte:head>
@@ -135,16 +133,14 @@ const submitHandler = async () => {
 
   <!--receipt-->
 
-
   {#if valid && receiptData}
     <div class="m-auto w-full bg-white py-4 pt-20 shadow-xl">
       <div class="text-center">
         <div class="text-2xl font-bold my-2">
           <img
             class="h-20 inline text-center"
-            src={logoSrc}
-            alt="logo"
-          />
+            src="../favicon.ico"
+            alt="logo" />
         </div>
         <div class="text-md font-light">
           {receiptData.vendor.vendorLocation}
@@ -178,19 +174,19 @@ const submitHandler = async () => {
           GST <span class="font-thin">(8%)</span>
         </div>
         <div class="col-span-2 mx-6 text-right">
-          ${(receiptData.gst)}
+          ${receiptData.gst}
         </div>
 
         <div class="col-span-4 mx-6 font-semibold">TOTAL</div>
         <div class="col-span-2 mx-6 text-right">
-          ${(receiptData.total)}
+          ${receiptData.total}
         </div>
 
-        <div class="col-span-4 mx-6 font-semibold"> 
-        {receiptData.paymentMethod}
+        <div class="col-span-4 mx-6 font-semibold">
+          {receiptData.paymentMethod}
         </div>
         <div class="col-span-2 mx-6 text-right">
-          ${(receiptData.total)}
+          ${receiptData.total}
         </div>
 
         <div class="col-span-4 mx-6 font-semibold">CHANGE</div>
@@ -202,16 +198,17 @@ const submitHandler = async () => {
       </div>
       <div class="mx-6 grid grid-cols-6">
         <div class="text-center col-span-6"
-        ><span>{date}</span>
-        <span>{time}</span></div> </div>
+          ><span>{date}</span>
+          <span>{time}</span></div>
+      </div>
     </div>
   {:else if valid}
-  <div class="m-auto w-full bg-white p-8">
-    <div class="text-center">
-      <h2 class="text-2xl font-bold mb-4">No matching receipts found</h2>
-      <p class="text-gray-600">Please check the receipt ID and total amount and try again.</p>
+    <div class="m-auto w-full bg-white p-8">
+      <div class="text-center">
+        <h2 class="text-2xl font-bold mb-4">No matching receipts found</h2>
+        <p class="text-gray-600"
+          >Please check the receipt ID and total amount and try again.</p>
+      </div>
     </div>
-  </div>
   {/if}
 </div>
-

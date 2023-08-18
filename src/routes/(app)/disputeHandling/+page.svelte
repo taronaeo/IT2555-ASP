@@ -31,17 +31,6 @@
   let filename = '';
   let userType = '';
 
-  if (!$authStore) {
-    userType = 'invalid';
-  }
-
-  if (userType === 'invalid') {
-    goto('/');
-  } else if ($authStore && $authStore.tenantId) {
-    userType = 'vendor';
-    goto('/');
-  }
-
   const q = query(receiptsRef, where('userUid', '==', UserUid));
 
   (async () => {

@@ -42,10 +42,10 @@
     key: string;
     secret: string;
   } = {
-    branchId: '',
-    vendorId: '',
-    key: '',
-    secret: '',
+    branchId: 'CompassOne',
+    vendorId: 'znCwL5z6fAppGcwWezLL',
+    key: 'k-_8/y8!/p0#Y-|W',
+    secret: 'KtVlV4PF(P^Vw^!3',
   };
 
   const food: { itemName: string; price: number }[] = [

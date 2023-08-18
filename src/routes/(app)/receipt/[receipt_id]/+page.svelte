@@ -258,12 +258,10 @@
           <div class:hidden={!assigned}>
             <div class="text-center">Have troubles with this receipt?</div>
             <div class="text-center"
-              ><button
-                on:click={() => {
-                  goto('/disputeHandling');
-                }}
-                class="md:mt-3 border-2 bg-emerald-600 px-5 py-2.5 m-2 text-white rounded-lg text-center"
-                >File Disputes with Vendor</button
+              ><a
+                href="/disputeHandling"
+                class="block md:mt-3 border-2 bg-emerald-600 px-5 py-2.5 m-2 text-white rounded-lg text-center"
+                >File Disputes with Vendor</a
               ></div>
           </div>
           <div class:hidden={assigned}>

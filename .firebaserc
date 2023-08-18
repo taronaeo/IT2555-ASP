@@ -1,5 +1,11 @@
 {
   "projects": {
     "default": "it2555-asp"
+  },
+  "targets": {},
+  "etags": {
+    "it2555-asp": {
+      "extensionInstances": {}
+    }
   }
 }
